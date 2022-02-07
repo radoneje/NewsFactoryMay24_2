@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="NewsFactory" Class="MainDataClassesDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost,1433;Initial Catalog=NewsFactory;User ID=NewsFactoryUser" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="NewsFactoryConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.tSTR_playlist" Member="tSTR_playlists">
+    <Type Name="tSTR_playlist">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="title" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="deleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="tSTR_playlist_tSTR_item" Member="tSTR_items" ThisKey="id" OtherKey="playlistId" Type="tSTR_item" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tSTR_items" Member="tSTR_items">
+    <Type Name="tSTR_item">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="playlistId" Type="System.String" DbType="NVarChar(90) NOT NULL" CanBeNull="false" />
+      <Column Name="text" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="isActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="isAlert" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="dateAdd" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="dateModify" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="deleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="sortOrder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="tSTR_item_tSTR_timer" Member="tSTR_timers" ThisKey="id" OtherKey="itemId" Type="tSTR_timer" />
+      <Association Name="tSTR_playlist_tSTR_item" Member="tSTR_playlist" ThisKey="playlistId" OtherKey="id" Type="tSTR_playlist" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tSTR_timers" Member="tSTR_timers">
+    <Type Name="tSTR_timer">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="itemId" Type="System.String" DbType="NVarChar(90) NOT NULL" CanBeNull="false" />
+      <Column Name="dateStart" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="deteEnd" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="dateInsert" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="isEnd" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="isDaily" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="deleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="tSTR_item_tSTR_timer" Member="tSTR_item" ThisKey="itemId" OtherKey="id" Type="tSTR_item" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Function Name="NewsFactoryUser.fSTR_getActiveTimers" Method="fSTR_getActiveTimers" IsComposable="true">
+    <Parameter Name="playListItemId" Type="System.String" DbType="NVarChar(90)" />
+    <Return Type="System.Boolean" />
+  </Function>
+  <Function Name="NewsFactoryUser.fSTR_getPassiveTimers" Method="fSTR_getPassiveTimers" IsComposable="true">
+    <Parameter Name="playListItemId" Type="System.String" DbType="NVarChar(90)" />
+    <Return Type="System.Boolean" />
+  </Function>
+</Database>

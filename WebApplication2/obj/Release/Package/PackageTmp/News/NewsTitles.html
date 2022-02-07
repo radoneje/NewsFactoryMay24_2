@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/Styles/NFW.css?date=25122119_1" rel="stylesheet" />
+    <script src="/Scripts/axios.min.js"></script>
+    <script src="/Scripts/vue.min.js"></script>
+    <title>NewsFactory: Titles</title>
+</head>
+<body>
+    <div id="app">
+        <div v-if="blocks.length==0">
+            <div class="tBtn">идет загрузка</div>
+        </div >
+        <div  v-else>
+            <div class="tNewsBox">
+                <div class="tBox">
+                    <div class="tBlockItem" v-for="item in blocks">
+                        <div class="tBlockName">
+                            {{item.type}}&nbsp{{item.name}}
+                        </div>
+                        <div class="tBlockTitle">
+                            <div class="tBlockTitleBox" v-if="item.titles.filter((t)=>t.type=='THM').length>0">
+
+                                <div class="tBlockThemesBox">
+                                    <div class="tThenesTitle">темы:</div>
+
+                                </div>
+                                <div class="tBlockTitle" v-for="title in item.titles" v-if="title.type=='THM'">
+                                    <div class="tBlockTheme">
+                                        <input class="tinputTh" v-bind:class="{err:title.text.length>themeMax}" type="text" v-model="title.text" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tSrcBox">
+                                <div class="tSrc">
+                                    <div class="tSrcWr" v-if="item.titles.filter((t)=>t.type=='SOT').length>0">
+                                        <div class="tSrcName">SOTs</div>
+                                        <div class="tBlockTitle tSotBox" v-for="title in item.titles" v-if="title.type=='SOT'" style="margin-top:5px">
+                                            <input class="tinputTh tSotName" v-bind:class="{err:title.name.length>sotNameMax}" type="text" v-model="title.name" />
+                                            <input class="tinputTh tSotPos" v-bind:class="{err:title.pos.length>sotPosMax}" type="text" v-model="title.pos" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tSrc">
+                                    <div class="tSrcWr" v-if="item.titles.filter((t)=>t.type=='GEO').length>0">
+                                        <div class="tSrcName">GEO tags</div>
+                                        <div class="tBlockTitle" v-for="title in item.titles" v-if="title.type=='GEO'">
+                                            <input class="tinputTh" v-bind:class="{err:title.text.length>geoMax}" type="text" v-model="title.text" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tSrc">
+                                    <div class="tSrcWr" v-if="item.titles.filter((t)=>t.type=='SRC').length>0">
+                                        <div class="tSrcName">SOURCE tags</div>
+                                        <div class="tBlockTitle" v-for="title in item.titles" v-if="title.type=='SRC'">
+                                            <input class="tinputTh" v-bind:class="{err:title.text.length>geoMax}" type="text" v-model="title.text" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tBtn" class="tBtn" v-bind:class="{active:isUploading}" v-on:click="upload()">Выгрузить на сервер</div>
+        </div>
+    </div>
+    <script src="/Scripts/newsTitleScript.js"></script>
+</body>
+</html>

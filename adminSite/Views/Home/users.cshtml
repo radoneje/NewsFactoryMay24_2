@@ -1,0 +1,44 @@
+﻿@model IEnumerable<adminSite.Models.User>
+
+
+<table style="margin-left:10px;">
+    <tr>
+        <th>
+            </th>
+<th>
+            @Html.DisplayNameFor(model => model.UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pass)
+        </th>
+        
+        <th>
+           последний вход
+        </th>
+        
+ 
+    </tr>
+    
+@foreach (var item in Model) {
+   
+    <tr>
+        <td>
+           
+            </td>
+<td>
+            @Html.DisplayFor(modelItem => item.UserName)
+        </td>
+        <td><div style="padding:4px 12px;">
+    @Html.DisplayFor(modelItem => item.pass)
+</div>
+        </td>
+        <td>
+           
+            @Html.DisplayFor(modelItem => item.Last_time)
+        </td>
+        
+        
+    </tr>
+}
+
+</table>

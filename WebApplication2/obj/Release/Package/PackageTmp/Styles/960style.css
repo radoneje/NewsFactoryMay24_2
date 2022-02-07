@@ -1,0 +1,125 @@
+﻿@media  screen and (max-width: 960px) {
+      .ArchiveFindSubBlocksContainer .media-body {
+        display: block;
+        width: 100%;
+    }
+
+    .BlockArchiveNameRowFirstContainer > table {
+        width: 100%;
+    }
+
+    .BlockArchiveNameControl {
+        float: none;
+        width: 100%;
+    }
+     .SubBlockAutorControl, SubBlockOperatorControl,.SubBlockTextControl, .SubBlockButtons{
+        margin-left:4px;
+    }
+    .blockListImage {
+        display:none;
+    }
+    #BlockEditNameTextBox {
+    width: 100%;
+    display: block;
+    font-size: large;
+    padding-top: 4px;
+    padding-bottom: 0;
+}
+    #BlockEditTypeDropDown{
+        width: 100%;
+    display: block;
+    }
+
+    .BETowerLR{
+        margin-top:0;
+    }
+  
+    .BEpanelWr{
+        height:inherit
+    }
+
+  
+    #ExtLinkOff, #ExtLinkOn{
+        display:none !important;
+    }
+    #BESymbolsCount{
+        display:none;
+    }
+    .mainHeadMenuItem:nth-child(n+4) {
+        display: none;
+    }
+
+    .ArchiveNewsContainer > .panel > .panel-heading, .LentaNewsContainer > .panel > .panel-heading {
+        height: auto !important;
+    }
+
+    .BlockNameTaskTimeControl {
+        display: none;
+    }
+    .BEhistoryWr {
+        left:0 !important;
+        width:100% !important;
+    }
+    .beReadyWr {
+        border:0;
+        width:100%;
+        text-align:left;
+    }
+    .beReadyWr label{
+        text-transform:uppercase;
+    }
+
+    #BlockEditInsertDropDown{
+        width:100%;
+    }
+    #BESynchTemplate{
+        display:none;
+    }
+
+    .mainHeadMenuScroll {
+        left: 20px;
+        background: white;
+        display:none !important;
+    }
+
+    .BlockArchiveNameRowFirstContainer td {
+        width: inherit;
+    }
+
+    .masterHeadContent {
+        position: inherit;
+        top: 30px;
+        left: 0;
+    }
+
+    .CenralTowerLCol {
+        width: 100%;
+        display: inline-block;
+        vertical-align: top;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .CenralTowerCCol {
+        /* min-width: 620px; */
+        /* width: calc(100% - 315px - 315px - 20px); */
+        display: inline-block;
+        vertical-align: top;
+        padding: 0px;
+        margin: 0px;
+        min-width: inherit;
+        width: 100%;
+    }
+    .messagerBody{
+    max-height: calc(100vh - 30px);
+    max-width:100%;
+    overflow-x:hidden;
+    }
+    .BlockNameEditControl{
+        display:none
+    }
+    .SubBlockImageControl, .BlockEditNameTextBoxCounter{
+        display:none;
+    }
+
+}

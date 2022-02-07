@@ -1,0 +1,144 @@
+﻿body {
+}
+
+.Wr {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    justify-content: center;
+}
+
+.pBlock {
+    width: 50%;
+}
+
+.pBody {
+    width: 100%;
+    position: relative;
+    height: 0;
+    padding-bottom: 56.2%;
+}
+
+.pBodyWr {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: gray;
+    color: white;
+    overflow: hidden;
+}
+
+#pPrompt {
+    background: #000000;
+    transform-origin: top left;
+    width: 1920px;
+    height: 1080px;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.vCtrlItems {
+    margin-top: 20px;
+}
+
+.vCtrlItem {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 6px;
+    margin-right: 40px;
+}
+
+    .vCtrlItem.disabled {
+        color: #858383;
+        background: #dfdfdf;
+    }
+
+.pitemTitle {
+    font-size: .8em;
+    color: gray;
+    text-align: center;
+}
+
+.pitemText {
+    margin-top: 1em;
+    line-height: 1.2em;
+    text-align: center;
+}
+
+.itemsWr {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000000;
+}
+
+.items {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: 1.2s linear;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.item {
+    margin-bottom: 1.5em;
+}
+
+.vBlockText {
+    font-size: 8px;
+    padding: 8px;
+}
+
+.pSpeedCtrl {
+    width: 100%;
+    height: 16px;
+    background: #0074803d;
+    border-radius: 2px;
+    position: relative;
+}
+
+#pSpeedCtrlPoint {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: green;
+    cursor: pointer;
+    width: 10px;
+}
+
+@keyframes flick {
+    0% {
+        background: inherit;
+        color: inherit
+    }
+
+    20% {
+        background: #8b0808;
+        color: white
+    }
+
+    80% {
+        background: #8b0808;
+        color: white
+    }
+
+    100% {
+        background: inherit;
+        color: inherit
+    }
+}
+
+.flicker {
+    animation: flick 2s infinite;
+}
+
+.vCtrlItem.active {
+    background: #00ff4378;
+}

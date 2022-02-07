@@ -1,0 +1,33 @@
+﻿@model IEnumerable<NFCrowlString.tSTR_item>
+
+<div>
+
+    <h4>
+        Пассивные строки
+    </h4>
+    <div id="strAddForm">
+        @using (Ajax.BeginForm("strAdd", new AjaxOptions() { OnSuccess = "$('#strAddFormText').val('').removeClass('ctrlOverflow'); $('.strPassiveBox').prepend(data);  var txtToFind = $('.findWr').find('input').val();  if (txtToFind != null || txtToFind.length > 0) onFind(txtToFind);" }))
+        {
+            <input type="hidden" name="playlistId" id="playlistDropDownHidden">
+        <input type="hidden" name="clientId" id="playlistClientIdHidden">
+        <input type="text" onkeydown="checkInputLen(this)"  onpaste="checkInputLen(this)" name="text" id="strAddFormText" maxlength="30000" placeholder="введите текст" />
+        <div class="addFormBtn" onclick="$(this).closest('form').submit();"></div>
+            <div style="clear:both"></div>
+        }
+       
+    </div>
+    <div class="strPassiveBox">
+
+        @foreach (var item in Model)
+        {
+            Html.RenderPartial("_playListPassiveItem", item);
+
+        }
+    </div>
+    </div>
+<script>
+    $('#playlistDropDownHidden').val($('#playlistDropDown').val());
+   
+</script>
+
+

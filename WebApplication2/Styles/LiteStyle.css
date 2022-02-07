@@ -1,0 +1,7 @@
+﻿.LileNewsItem{
+    padding-left:10px;
+    cursor:pointer;
+}
+.NewsItemSelected{
+    background-color: #eeffee;
+}

@@ -1,0 +1,20 @@
+﻿@model IEnumerable<NFCrowlString.Models.Ctimer>
+
+<div class="timerBox">
+    <div class="timerItemAdd" onclick="timerItemAdd(this)">
+    </div>
+
+    <div class="timerBoxItems">
+        @foreach (var item in Model)
+        {
+            <div class="timerItemWr" id="timerItemWr_@item.id">
+
+                @{Html.RenderPartial("_passiveTimerItem", item);}
+            </div>
+        }
+       
+    </div>
+</div>
+
+
+

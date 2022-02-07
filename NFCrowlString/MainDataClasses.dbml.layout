@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="MainDataClasses">
+  <DataContextMoniker Name="/MainDataClassesDataContext" />
+  <nestedChildShapes>
+    <classShape Id="5bd8f410-6ffc-49d9-8f1d-9f76d9a631a8" isExpanded="false" absoluteBounds="0.625, 1.125, 2, 0.45">
+      <DataClassMoniker Name="/MainDataClassesDataContext/tSTR_playlist" />
+      <nestedChildShapes>
+        <elementListCompartment Id="36f3737a-0184-4fab-bcd9-ff7121d5d3bf" absoluteBounds="0.64, 1.585, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="4daeee2d-98e5-4e74-8c3f-cf81b84eb40c" isExpanded="false" absoluteBounds="2.875, 1.125, 2, 0.45">
+      <DataClassMoniker Name="/MainDataClassesDataContext/tSTR_item" />
+      <nestedChildShapes>
+        <elementListCompartment Id="42deb0bb-ad4b-462d-99b4-37f8d5fb430a" absoluteBounds="2.8899999999999997, 1.585, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.625 : 1.35); (2.875 : 1.35)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/MainDataClassesDataContext/tSTR_playlist/tSTR_playlist_tSTR_item" />
+      <nodes>
+        <classShapeMoniker Id="5bd8f410-6ffc-49d9-8f1d-9f76d9a631a8" />
+        <classShapeMoniker Id="4daeee2d-98e5-4e74-8c3f-cf81b84eb40c" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="da20a8fc-a4f8-44b8-afca-5052cfb68bca" isExpanded="false" absoluteBounds="4.875, 1.125, 2, 0.45">
+      <DataClassMoniker Name="/MainDataClassesDataContext/tSTR_timer" />
+      <nestedChildShapes>
+        <elementListCompartment Id="b67b07e7-6d8b-4320-8867-278766d86649" absoluteBounds="4.89, 1.585, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(3.875 : 1.575); (3.875 : 1.95); (5.875 : 1.95); (5.875 : 1.575)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/MainDataClassesDataContext/tSTR_item/tSTR_item_tSTR_timer" />
+      <nodes>
+        <classShapeMoniker Id="4daeee2d-98e5-4e74-8c3f-cf81b84eb40c" />
+        <classShapeMoniker Id="da20a8fc-a4f8-44b8-afca-5052cfb68bca" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

@@ -1,0 +1,167 @@
+﻿http://stackoverflow.com/questions/17197970/facebook-permanent-page-access-token/28418469#28418469
+
+
+
+
+https://graph.facebook.com/v2.8/oauth/access_token?grant_type=fb_exchange_token&client_id=1882210035401994&client_secret=5e4bcfe3b07f5ea4e8ea91e020859695&fb_exchange_token=EAAav3CyNhQoBAA3ts6vxzk1pJU3qDV08QFypxKj97A11r4nqugo9sYpTV7QBXNWVTXWq5RctjgkokfHwpAGmkUhocy8ZB25AZCsDeD2XWqu5TifkUOHXKymSCVuu8zQy8boWZCh81jl7H6vOIsGEBpovtWQUIWdJwQ4h7yV6XtXIeEnqFHI
+{"access_token":"EAAav3CyNhQoBAHOTQlw6Nw0Q1zZAvZAqVgLxZCZBFCsiZBng3atiylYYuhJfpJZC4HwYQBkyhGTjWZBrjbgJTCAYrgDzrRkU0H7pSA3BOj0i6ZAhOzzhdOKvQKy9kkUDC271z8yYWZCuWA0JyoG8l53yqmuSC8UWpyvsZD","token_type":"bearer"}
+
+https://graph.facebook.com/v2.8/me?access_token=EAAav3CyNhQoBAHOTQlw6Nw0Q1zZAvZAqVgLxZCZBFCsiZBng3atiylYYuhJfpJZC4HwYQBkyhGTjWZBrjbgJTCAYrgDzrRkU0H7pSA3BOj0i6ZAhOzzhdOKvQKy9kkUDC271z8yYWZCuWA0JyoG8l53yqmuSC8UWpyvsZD
+
+{
+   "name": "Denis Shevchenko",
+   "id": "10212161657459364"
+}
+
+https://graph.facebook.com/v2.8/10212161657459364/accounts?access_token=EAAav3CyNhQoBAHOTQlw6Nw0Q1zZAvZAqVgLxZCZBFCsiZBng3atiylYYuhJfpJZC4HwYQBkyhGTjWZBrjbgJTCAYrgDzrRkU0H7pSA3BOj0i6ZAhOzzhdOKvQKy9kkUDC271z8yYWZCuWA0JyoG8l53yqmuSC8UWpyvsZD
+
+{
+   "data": [
+      {
+         "access_token": "EAAav3CyNhQoBAAHT7syloHhk1ckhBWu1ZBl0rOTfNSexGPNsqg5m26apMqPR70sGPbgSZBXBV3unsmuNjnKZAkTrhLmXU1VkFOnqVHHoZBHruW6iZCkZA2i4PoKjJoUcJZCcaD9OH7T0XyPMvsOnFFHofmlRHm0NtLAFBfZA87c2mgZDZD",
+         "category": "Company",
+         "name": "Newsfactorytest",
+         "id": "1321004877953883",
+         "perms": [
+            "ADMINISTER",
+            "EDIT_PROFILE",
+            "CREATE_CONTENT",
+            "MODERATE_CONTENT",
+            "CREATE_ADS",
+            "BASIC_ADMIN"
+         ]
+      }
+   ],
+   "paging": {
+      "cursors": {
+         "before": "MTMyMTAwNDg3Nzk1Mzg4MwZDZD",
+         "after": "MTMyMTAwNDg3Nzk1Mzg4MwZDZD"
+      }
+   }
+}
+
+//////// YOUTUBE
+Before you start
+https://developers.google.com/youtube/v3/getting-started?hl=ru
+
+You need a Google Account to access the Google Developers Console, request an API key, and register your application.
+Create a project in the Google Developers Console and obtain authorization credentials so your application can submit API requests.
+After creating your project, make sure the YouTube Data API is one of the services that your application is registered to use:
+
+Go to the Developers Console and select the project that you just registered.
+Open the API Library in the Google Developers Console. If prompted, select a project or create a new one. In the list of APIs, make sure the status is ON for the YouTube Data API v3.
+If your application will use any API methods that require user authorization, read the authentication guide to learn how to implement OAuth 2.0 authorization.
+Select a client library to simplify your API implementation.
+Familiarize yourself with the core concepts of the JSON (JavaScript Object Notation) data format. JSON is a common, language-independent data format that provides a simple text representation of arbitrary data structures. For more information, see json.org.
+
+VK
+создание приложения https://vk.com/editapp?act=create 
+client_id=6172439 - ip приложения
+https://oauth.vk.com/authorize?client_id=6172439&display=page&redirect_uri=https://api.vk.com/blank.html&scope=141469&response_type=token&v=5.62&state=123456
+правильно!
+
+ok.ru
+https://connect.ok.ru/oauth/authorize?client_id=1250207744&scope=VALUABLE_ACCESS;LONG_ACCESS_TOKEN;PHOTO_CONTENT;VIDEO_CONTENT&response_type=code&redirect_uri=http://nf.rustv.ru/
+
+https://api.ok.ru/oauth/token.do?code={code}&client_id=1250207744&client_secret=CA6315C282B7E14892B887D3&redirect_uri=http://nf.rustv.ru/&grant_type=authorization_code
+{"access_token":"a7ipa.278o006n2x6c451b623k69srvg6","refresh_token":"498373337b12b9c10e31a2bc669675c5b4db6b3b_570271065458_1487","expires_in":"1800"}
+{"access_token":"9.ipa91u006v3o6a6j1e203k15srvd21914","refresh_token":"b52177439841_87b12b9c10e31a2bc669675c5b4db6b3b_5702710654d","expires_in":"1800"}
+
+5. Использование refresh_token Имея токен обновления refresh_token, можно получить access_token по упрощённой процедуре, сделав один POST-запрос на URL:
+https://api.ok.ru/oauth/token.do?refresh_token={refresh_token}&client_id={client_id}&client_secret={client_secret}&grant_type=refresh_token
+
+
+ static string MD5(string str)
+        {
+            byte[] hash = Encoding.ASCII.GetBytes(str);
+            var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte[] hashenc = md5.ComputeHash(hash);
+            string result = "";
+            foreach (var b in hashenc)
+            {
+                result += b.ToString("x2");
+            }
+            return result.ToLower();
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (System.Net.WebClient webClient = new System.Net.WebClient())
+            {
+                
+                var application_id = "1250207744";
+                var application_key = "CBAJKFILEBABABABA";//public
+                var application_secret_key = "CA6315C282B7E14892B887D3";
+                var refresh_token = "498373337b12b9c10e31a2bc669675c5b4db6b3b_570271065458_1487";
+
+                string tokens = /*System.Web.Helpers.*/Newtonsoft.Json.JsonConvert.SerializeObject(new {
+                    application=application_id,
+                    application_key=application_key,
+                    application_secret_key=application_secret_key,
+                    token = refresh_token
+                });
+
+                string access_token ="";// "a7ipa.278o006n2x6c451b623k69srvg6";
+                
+                var r = new System.Collections.Specialized.NameValueCollection();
+                r.Add("message", "");
+
+                //получаем access
+                string url = "https://api.ok.ru/oauth/token.do?refresh_token=" + refresh_token + "&client_id=" + application_id + "&client_secret=" + application_secret_key + "&grant_type=refresh_token";
+
+                var rr=webClient.UploadValues(url, "POST", r);
+                string responsebody = Encoding.UTF8.GetString(rr);
+                access_token = System.Web.Helpers.Json.Decode(responsebody).access_token;
+
+                var secret_key = MD5(access_token + application_secret_key);
+                var calcStr = "application_key=" + application_key + "format=jsonmethod=photosV2.getUploadUrl" + secret_key;
+                var sig = MD5(calcStr);
+
+                string reqUrl="https://api.ok.ru/fb.do?application_key=" + application_key + "&format=json&method=photosV2.getUploadUrl&sig="+sig+"&access_token="+access_token;
+
+                var resp = webClient.DownloadString(reqUrl);
+
+
+            }
+
+			zYjkfd5VaSP5p8E6m++r0q8X97B1cFYs+r0zno/lGe+s0WXJ9ZTE9A== = {System.Web.Helpers.DynamicJsonObject}
+			zYjkfd5VaSP5p8E6m++r0q8X97B1cFYs+r0zno/lGe+s0WXJ9ZTE9A==
+
+			https://api.ok.ru/fb.do
+?application_key=CBAJKFILEBABABABA
+&format=json
+&method=photosV2.commit
+&photo_id=goIVeqMQGHRncReR%2F1IlhNN9O0k5tFRsEs%2FoBd6tj27FuLElGc2WQw%3D%3D
+&token=LagQNWPkou83Ib61Es0UIVQAO1AYm0%2BXM%2BNiVUGv8ig37hO5vIWvCj2DRBQrUBkf4DCB5dY9qn9W5oKHhNp3bmEgYogPjSdgx1EUj26lXKjckyxWK4osUcwgt2hYLX8miaMtY2Sdn4BflrD5h5DTfA%3D%3D
+&sig=3653065ed139c6418ea613604d7aab07
+&access_token=b2ipa.314erk00554n1p4z1e3l3k4jsrve8
+https://api.ok.ru/fb.do
+?application_key=CBAJKFILEBABABABA
+&format=json
+&method=photosV2.commit
+&photo_id=goIVeqMQGHRncReR/1IlhNN9O0k5tFRsEs/oBd6tj27FuLElGc2WQw==&token=LagQNWPkou83Ib61Es0UIVQAO1AYm0+XM+NiVUGv8ig37hO5vIWvCj2DRBQrUBkf4DCB5dY9qn9W5oKHhNp3bmEgYogPjSdgx1EUj26lXKjckyxWK4osUcwgt2hYLX8miaMtY2Sdn4BflrD5h5DTfA==&sig=3653065ed139c6418ea613604d7aab07&access_token=b2ipa.314erk00554n1p4z1e3l3k4jsrve8
+
+title = "РіР»Р°РІР° РІРµСЂРЅСѓР»СЃСЏ"
+
+
+https://api.ok.ru/fb.do
+?application_key=CBAJKFILEBABABABA
+&format=json
+&message=%D0%B3%D0%BB%D0%B0%D0%B2%D0%B0%20%D0%B2%D0%B5%D1%80%D0%BD%D1%83%D0%BB%D1%81%D1%8F
+&method=stream.publish
+&sig=8a9116332382dd1d227ff747131712ce
+&access_token=evipa.7882dehc002o616l461e5t3k3psra
+
+
+https://api.ok.ru/fb.do
+?application_key=CBAJKFILEBABABABA
+&format=json
+&message=%D0%B3%D0%BB%D0%B0%D0%B2%D0%B0+%D0%B2%D0%B5%D1%80%D0%BD%D1%83%D0%BB%D1%81%D1%8F
+&method=stream.publish
+&sig=9995d10908dc0c337c146a3cb228fb83
+&access_token=evipa.7882dehc002o616l461e5t3k3psra
+
+application_key=CBAJKFILEBABABABAformat=jsonmessage=глава вернулсяmethod=stream.publishad1786a0d90720b728cf3772cb46e5c0
+application_key=CBAJKFILEBABABABAformat=jsonmessage=глава вернулсяmethod=stream.publishad1786a0d90720b728cf3772cb46e5c0
+
+
+

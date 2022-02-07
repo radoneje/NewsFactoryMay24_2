@@ -1,0 +1,22 @@
+﻿@model IEnumerable<NFCrowlString.tSTR_item>
+
+<div>
+
+    <h4 onclick="activeHeaderClick()" class="ActiveBoxTitle">
+        Активные (<span class="activeCount"></span>) <div class="ActiveBoxTitleExpand">развернуть</div>
+    </h4>
+    <div class="strActiveBox">
+
+        @foreach (var item in Model)
+        {
+            Html.RenderPartial("_playListActiveItem", item);
+        }
+    </div>
+    <script>
+        setTimeout(function () { calculateActiveItems() }, 1000);
+
+    </script>
+
+</div>
+
+

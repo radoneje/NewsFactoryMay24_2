@@ -1,0 +1,20 @@
+﻿@media  screen and (max-width: 1260px) {
+
+   /* .BEwrapper {
+        width: 830px;
+    }*/
+
+    .BETowerL, .panelBlockSocial, .BEpanel {
+        width: 100%;
+        display: block;
+        float: none;
+    }
+
+    .BETowerLR {
+        display: block !important;
+        float: none;
+        position: initial;
+        margin-top: 80px;
+        width: 100%;
+    }
+}

@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+<h2>Login</h2>
+<div style="width:600px; margin:0 auto">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2>Вход</h2>
+        </div>
+        <div class="panel-body" id="loginBody">
+            
+            @Html.Partial("passForm", new  {l="", p="" })
+        </div>
+    </div> 
+</div>

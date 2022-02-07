@@ -1,0 +1,10 @@
+C:\projects\NewsFactoryMay24\barryArchiveFixer\bin\Debug\barryArchiveFixer.exe.config
+C:\projects\NewsFactoryMay24\barryArchiveFixer\bin\Debug\barryArchiveFixer.exe
+C:\projects\NewsFactoryMay24\barryArchiveFixer\bin\Debug\barryArchiveFixer.pdb
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.csprojAssemblyReference.cache
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.Form1.resources
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.Properties.Resources.resources
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.csproj.GenerateResource.cache
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.csproj.CoreCompileInputs.cache
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.exe
+C:\projects\NewsFactoryMay24\barryArchiveFixer\obj\Debug\barryArchiveFixer.pdb

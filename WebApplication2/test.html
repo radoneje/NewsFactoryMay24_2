@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div>bla-bla</div>
+    <input type="button" value="send" onclick="send()" />
+    <script>
+        var url = document.location.host + document.location.port == 80 ? (":" + document.location.port) : ""
+        var s = new WebSocket("ws://" + document.location.host + "/ws.ashx");
+        s.onerror = (e) => { console.log("error", e) }
+        s.onmessage = (e) => { console.log("message", e) }
+        s.onopen = (e) => { console.log("open", e) }
+
+        function send() {
+            console.log("before send")
+            s.send("Привет");
+        }
+    </script>
+</body>
+</html>

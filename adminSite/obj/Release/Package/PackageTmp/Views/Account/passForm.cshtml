@@ -1,0 +1,7 @@
+﻿
+@using (Ajax.BeginForm("passForm", new AjaxOptions() { UpdateTargetId = "loginBody", HttpMethod="POST" }))
+{
+    <input type="text" class="form-control" placeholder="login" name="l" value="@ViewBag.l"/>
+    <input type="password" class="form-control" placeholder="pass" name="p"  />
+    <input type="submit" class="btn btn-success" value="Войти"/>
+}

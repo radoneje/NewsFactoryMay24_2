@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>список пользователей</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>список пользователей</h4>
+    </div>
+    <div class="panel-body">
+        @Html.Partial("users", (IEnumerable<adminSite.Models.User>)@ViewBag.u)
+    </div>
+</div>

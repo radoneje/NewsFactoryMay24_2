@@ -1,0 +1,3476 @@
+﻿////////////
+
+
+EXECUTE sp_configure 'show advanced options', 1
+RECONFIGURE WITH OVERRIDE
+GO
+
+EXECUTE sp_configure 'Agent XPs', 1
+RECONFIGURE WITH OVERRIDE
+GO
+
+EXECUTE sp_configure 'show advanced options', 0
+RECONFIGURE WITH OVERRIDE
+GO
+/*
+///////////
+%windir%\Microsoft.NET\Framework64\v4.0.30319
+Aspnet_regsql.exe -ssadd -E
+
+в веб-конфиг
+<system.web>
+ <pages>
+    <sessionState mode="SQLServer"
+       sqlConnectionString="Data Source=localhost,1433;User ID=sa;Password=123" />
+    <httpHandlers />
+    <pages controlRenderingCompatibilityVersion="4.0" enableEventValidation="false">
+    </pages>
+  </system.web>
+  <system.webserver>
+   <defaultDocument>
+      <files>
+        <clear />
+        <add value="index.aspx" />
+      </files>
+    </defaultDocument>
+	</system.webserver>
+////////////////
+*/
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[pWeb_log] 
+	-- Add the parameters for the stored procedure here
+	@userId int,
+	@sect int, -- 0 - News 2 - Archive
+	@itemId bigint,
+	@event int --- 3 del news 4 del block
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	INSERT INTO log( Userid, ComputerName , ItemID, Sect, EventDate, Event)
+	values(@userId, 'NF WEB', @itemId, @sect, GETDATE(),@event)
+END
+
+GO
+
+
+ALTER TABLE [dbo].[ArchBlocks]
+ADD  [CutterId] int NOT NULL DEFAULT 0
+GO
+
+ALTER TABLE [dbo].[Blocks]
+ADD  [CutterId] int NOT NULL DEFAULT 0
+GO
+
+USE [NewsFactory]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER FUNCTION [dbo].[fWeb_ListUsersTOBlockEditorsList] 
+(	
+	-- Add the parameters for the function here
+	@BlockId bigint
+)
+RETURNS TABLE 
+AS
+RETURN 
+(
+	Select ProgramID, RightID, UserID, UserName, UserRate From vWeb_UserRight WHERE (RightID IN (32,33,34,57))AND ProgramID=dbo.fWeb_ProgramIdFromBlockId(@BlockId)
+)
+GO
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_ArchiveToNews] 
+@id  Bigint
+
+AS
+
+-- ???????? ?????? ?? ?????? ? ?????????? ???????? ??????? ??? ????? ? ????????
+-- ???? - id ???????
+-- ????? - 0- ??, 1- ??????
+
+-- Archive_to_news
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+Declare @News_id bigint
+Declare @New_News_id bigint
+Declare @Block_id bigint
+Declare @New_Block_id bigint
+Declare @Subblock_id bigint
+Declare @New_Subblock_id bigint
+
+IF (SELECT count([id]) FROM ArcNews WHERE [id] = @id) < 1 RETURN 1
+SET @News_id  = @id
+
+BEGIN TRANSACTION ArchiveToNews
+
+SET @Error_Num=2627
+SET @Error_Count=0
+WHILE (@Error_Num=2627) and (@Error_Count <10) 
+BEGIN
+	SET @New_News_id = (convert(bigint,rand()*1000000000000000))
+	SET @Error_Count=@Error_Count+1
+	INSERT INTO News ([id], [Name], EditorId, NewsDate, [Description], NewsTime, 
+				CalcTime, TaskTime, ProgramId, Deleted, Cassete, Time_Code, Duration)
+	SELECT @New_News_id, [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, 
+		TaskTime, ProgramId, Deleted, Cassete, Time_Code, Duration
+	FROM ArcNews WHERE [id]=@News_id
+             SET @Error_Num=@@ERROR
+END
+IF  @Error_Num <> 0 
+BEGIN
+	ROLLBACK TRANSACTION ArchiveToNews
+	RETURN 1
+END
+
+DECLARE st cursor FOR SELECT [id] FROM ArchBlocks where newsid = @News_id  AND ParentId=0
+OPEN st
+FETCH NEXT FROM st INTO @Block_id
+WHILE @@fetch_status=0
+BEGIN
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+		BEGIN
+			SET @Error_Count=@Error_Count+1
+			SET @New_Block_id=(convert(bigint,rand()*1000000000000000))
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, 
+						OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, 
+						BlockText, Sort, [Description], Ready, Approve,TextLang1,TextLang2,TextLang3 )
+			SELECT @New_Block_id, [Name], @New_News_id, ParentId, BLockType, CreatorId, 
+				OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, 
+				[Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  ArchBlocks where id=@Block_id
+		        SET @Error_Num=@@ERROR
+		END
+		IF  @Error_Num <> 0 
+		BEGIN
+			CLOSE st
+			DEALLOCATE st			
+			ROLLBACK TRANSACTION ArchiveToNews
+			RETURN 1
+		END
+
+	IF(SELECT count([id]) FROM ArchBlocks WHERE ParentId=@Block_id) > 0
+	BEGIN
+		DECLARE st1 cursor FOR SELECT [id] FROM ArchBlocks WHERE  ParentId=@Block_id
+		OPEN st1
+		FETCH NEXT FROM st1 INTO @Subblock_id
+		WHILE @@fetch_status=0
+    		BEGIN
+			SET @Error_Num=2627
+			SET @Error_Count=0
+			WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+				BEGIN
+					SET @Error_Count=@Error_Count+1
+					SET @New_Subblock_id= (convert(bigint,rand()*1000000000000000))
+					INSERT INTO Blocks ([Id], [Name], ParentId, NewsId, BLockType, CreatorId, 
+								OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+								BlockText, Sort, [Description], Ready, Approve)
+					SELECT @New_Subblock_id, [Name], @New_Block_id, @New_News_id, BLockType, 
+						CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+						BlockText, Sort, [Description], Ready, Approve
+                       			FROM  ArchBlocks WHERE [id]=@Subblock_id
+		             		SET @Error_Num=@@ERROR
+				END
+			IF  @Error_Num <> 0 
+				BEGIN
+					CLOSE st
+					DEALLOCATE st
+					CLOSE st1
+					DEALLOCATE st1		
+					ROLLBACK TRANSACTION ArchiveToNews
+					RETURN 1
+				END
+			FETCH NEXT FROM st1 INTO @Subblock_id
+		END
+		CLOSE st1
+		DEALLOCATE st1
+	END
+	FETCH NEXT FROM st INTO @Block_id
+END
+CLOSE st
+DEALLOCATE st
+COMMIT TRANSACTION ArchiveToNews
+RETURN 0
+
+
+GO
+
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_BlockFromTemplate]
+@BlockId bigint,
+@NewsId bigint,
+@AfterBlockId bigint
+AS
+
+-- BlockFromTemplate
+
+DECLARE @New_Block_id bigint
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+IF ((SELECT CopyNews.GroupID FROM Blocks INNER JOIN CopyNews ON Blocks.NewsId = CopyNews.[id] WHERE Blocks.[Id] = @BlockId)>=100)
+BEGIN
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+	BEGIN
+		SET @Error_Count=@Error_Count+1
+		SET @New_Block_id=(convert(bigint,rand()*1000000000000000))
+		INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, 
+				OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, 
+				Sort, [Description], Ready, Approve, deleted, TextLang1,TextLang2,TextLang3)
+		SELECT @New_Block_id, [Name], @NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+			JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+			Ready, Approve, deleted, TextLang1,TextLang2,TextLang3 
+		FROM blocks WHERE [id]=@BlockId
+		SET @Error_Num=@@ERROR
+	END
+	IF  @Error_Num <> 0 RETURN 1
+END
+ELSE
+BEGIN
+	UPDATE Blocks SET NewsId =@NewsId WHERE [id]=@BlockId
+	SET @Error_Num=@@ERROR
+	IF  @Error_Num <> 0 RETURN 1
+END
+	UPDATE Blocks SET Sort=(SELECT     Sort+5 FROM    Blocks WHERE [Id]=@AfterBlockId ) WHERE  [id]=@New_Block_id
+RETURN 0
+
+
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_BlockToCopybox]
+@in  Bigint,
+@TemplateId  Bigint,
+@NewId Bigint
+AS
+
+-- ???????? ???? ? ?????????? ?? ??????? ? ?????????? ? ???????
+-- ???? @in - id ??????????? ?????, @TemplateId - id ??????? ? ??????? ???? ??????????, @NewId - ????? id ?????
+-- ???? 0- ??, 1 - ??????
+
+-- BlocksCopyToTemplate
+
+DECLARE @in_Id Bigint
+DECLARE @New_subblock_id bigint
+DECLARE @Subblock_id bigint
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+SET @in_Id = @in
+
+BEGIN TRANSACTION BlockToCopybox
+
+INSERT INTO Blocks  ([Id], NewsId, Blocktext, parentid, [Name], BLockType, CreatorId, OperatorId, JockeyId,CutterId,
+			[Description], BlockTime, TaskTime, CalcTime, Sort , TextLang1,TextLang2,TextLang3 )
+SELECT @NewId, @TemplateId, Blocktext, 0, [Name], BLockType, CreatorId, OperatorId, JockeyId,CutterId,[Description], 
+	BlockTime, TaskTime, CalcTime,0, TextLang1,TextLang2,TextLang3  
+FROM Blocks WHERE [id]=@in_Id
+SET @Error_Num=@@ERROR
+IF  @Error_Num <> 0 
+BEGIN
+	ROLLBACK TRANSACTION BlockToCopybox
+	RETURN 1
+END
+
+IF(SELECT count([id]) FROM Blocks WHERE ParentId=@in_Id) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@in_Id
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		SET @Error_Num=2627
+		SET @Error_Count=0
+		WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+		BEGIN
+			SET @Error_Count=@Error_Count+1
+			SET @New_subblock_id= convert(bigint,rand()*1000000000000000) 
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve)
+			SELECT @New_subblock_id, [Name], @TemplateId, @NewId, BLockType, CreatorId, OperatorId, 
+				JockeyId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve
+			FROM  Blocks WHERE [id]=@Subblock_id
+			SET @Error_Num=@@ERROR
+		END
+		IF  @Error_Num <> 0 
+		BEGIN
+			CLOSE st1
+			DEALLOCATE st1		
+			ROLLBACK TRANSACTION BlockToCopybox
+			RETURN 1
+		END
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+END
+COMMIT TRANSACTION BlockToCopybox
+RETURN 0
+
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vWeb_BlockForPrintTemplate]
+AS
+SELECT     dbo.Blocks.Id, dbo.Blocks.Name, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.OperatorId, dbo.Blocks.JockeyId, dbo.Blocks.BlockTime, dbo.Blocks.TaskTime, 
+                      dbo.Blocks.CalcTime, dbo.Blocks.BlockText, dbo.Blocks.Sort, dbo.Blocks.Description, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.BLockType, dbo.BlockType.TypeName, 
+                      dbo.Blocks.CutterId
+FROM         dbo.Blocks INNER JOIN
+                      dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+
+GO
+
+
+INSERT INTO dbo.TemplateVariables(id, Name, Description,Depend, Type ) VALUES(381,'$BlockCutter', 'монтажер блока',2,0 )
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_NewsToArchive] 
+@News_id  Bigint
+
+AS
+
+-- ????????? ?????? ? ????? ??????? ????????? ???? ???? ? ??????? ??????
+-- ??????? ???????? @News_id  - id ???????
+-- ?????  RETURN ??? ?????? ??? 0 ???? ??????? ??? 2 ???? 
+
+-- News_To_Archive
+
+DECLARE @rustv_err_status int
+DECLARE @err_status int
+
+IF ((SELECT rustv FROM programs WHERE [id] IN (SELECT programid FROM news WHERE [id]=@News_id))>0)
+EXECUTE @rustv_err_status = sp_NewsToOutbox 0, @News_id
+IF (@rustv_err_status <> 0) SET @rustv_err_status = @rustv_err_status*10
+
+BEGIN TRANSACTION NewsToArchive
+
+INSERT INTO ArcNews  ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, ProgramId, 
+			Cassete, Time_Code, Duration, Deleted)
+SELECT [id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+	ProgramId, Cassete, Time_Code, Duration, Deleted
+FROM News WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+INSERT INTO ArchBlocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, 
+			TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3)
+SELECT [Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, 
+	CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+FROM  Blocks WHERE NewsId=@News_id and deleted=0
+----------------------------------
+
+                      
+---------------------------------
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+
+
+DELETE FROM news WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+COMMIT TRANSACTION NewsToArchive
+
+
+RETURN @rustv_err_status
+
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_NewsToCopybox]
+@News_id  Bigint,
+@GroupId Bigint,
+@UserId Bigint
+
+AS
+
+-- ????????? ??????????? ??????? ?? ?????????? ???????? ? ??????? ??? ???????
+-- ???????? ????????? @News_id - ????? ?????? ???????? @GroupId - ????????? ? ????? ?????? ?????????? ??? ??? ??? ?????? ? 
+-- ????????, @UserId - ? ?????? ?????? ??????? ????????? ? ??? ?????? ??????? ??????????
+-- ????????? ???????? RETURN - ??? ?????? - ???? 0 ?? ???????
+
+-- News_to_copyBox
+
+DECLARE @New_CopyNews_id bigint
+DECLARE @Block_id bigint
+DECLARE @New_Block_id bigint
+DECLARE @New_Subblock_id bigint
+DECLARE @Subblock_id bigint
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+
+BEGIN TRANSACTION NewsToCopyNews
+
+SET @Error_Num=2627
+SET @Error_Count=0
+WHILE (@Error_Num=2627) and (@Error_Count <10) 
+BEGIN
+        SET @New_CopyNews_id = (convert(bigint,rand()*1000000000000000))
+	SET @Error_Count=@Error_Count+1
+	INSERT INTO CopyNews ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+				ProgramId, Deleted, Cassete, Time_Code, Duration, GroupID)
+	SELECT @New_CopyNews_id, [Name], @UserId, NewsDate, [Description], NewsTime, CalcTime, 
+		TaskTime, ProgramId, Deleted, Cassete, Time_Code, Duration,@GroupId 
+	FROM News WHERE ([id] = @News_id)
+	SET @Error_Num=@@ERROR
+END
+if  @Error_Num <> 0 
+BEGIN
+	ROLLBACK TRANSACTION NewsToCopyNews
+	RETURN 1
+END
+-- ???? ?? ??????? ???? ?????? ???????
+DECLARE st cursor FOR SELECT [id] FROM Blocks where newsid = @News_id  AND ParentId=0 AND deleted=0
+OPEN st
+FETCH NEXT FROM st INTO @Block_id
+WHILE @@fetch_status=0
+BEGIN
+
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+		BEGIN
+			SET @Error_Count=@Error_Count+1
+			SET @New_Block_id=(convert(bigint,rand()*1000000000000000))
+     			INSERT INTO Blocks  ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready,  Approve, TextLang1,TextLang2,TextLang3)
+			SELECT @New_Block_id, [Name], @New_CopyNews_id, ParentId, BLockType, CreatorId, OperatorId, 
+				JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks where id=@Block_id
+			SET @Error_Num=@@ERROR
+		END
+		IF  @Error_Num <> 0 
+		BEGIN
+			CLOSE st
+			DEALLOCATE st			
+			ROLLBACK TRANSACTION NewsToCopyNews
+			RETURN 1
+		END
+-- ???? ?? ??????? ???? ??????????? ?????? ?????
+	IF(SELECT count([id]) FROM blocks WHERE ParentId=@Block_id) > 0
+	BEGIN
+		DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE  ParentId=@Block_id
+		OPEN st1
+		FETCH NEXT FROM st1 INTO @Subblock_id
+		WHILE @@fetch_status=0
+    		BEGIN
+
+			SET @Error_Num=2627
+			SET @Error_Count=0
+			WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+				BEGIN
+					SET @Error_Count=@Error_Count+1
+					SET @New_Subblock_id= (convert(bigint,rand()*1000000000000000))
+					INSERT INTO Blocks ([Id], [Name], ParentId, NewsId, BLockType, CreatorId, 
+								OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+								BlockText, Sort, [Description], Ready, Approve)
+					SELECT @New_Subblock_id, [Name], @New_Block_id, @New_CopyNews_id, BLockType, 
+						CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+						BlockText, Sort, [Description], Ready, Approve
+					FROM  Blocks WHERE [id]=@Subblock_id
+					SET @Error_Num=@@ERROR
+				END
+			IF  @Error_Num <> 0 
+				BEGIN
+					CLOSE st
+
+					DEALLOCATE st
+
+					CLOSE st1
+
+					DEALLOCATE st1
+
+					ROLLBACK TRANSACTION NewsToCopyNews
+					RETURN 1
+				END
+			FETCH NEXT FROM st1 INTO @Subblock_id
+		END
+		CLOSE st1
+		DEALLOCATE st1
+	END
+	FETCH NEXT FROM st INTO @Block_id
+END                 
+CLOSE st
+DEALLOCATE st
+COMMIT TRANSACTION NewsToCopyNews
+RETURN 0
+
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name + ' - copy', @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@NewBlockId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@NewBlockId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+GO
+
+USE [NewsFactory]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@NewBlockId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@NewBlockId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	--EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+GO
+USE [NewsFactory]
+GO
+
+
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name + ' - copy', @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1,TextLang2,TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+
+GO
+
+USE [NewsFactory]
+GO
+
+
+
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1, TextLang2, TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1, TextLang2, TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	--EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pWeb_UnlookBlockFromUser]    Script Date: 03/08/2017 20:31:00 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[pWeb_UnlookBlockFromUser]
+	@UserId int
+AS
+BEGIN
+
+	DELETE FROM dbo.Locking WHERE UserId=@UserId
+END
+
+GO
+CREATE PROCEDURE [dbo].[pWeb_UpdateLookingFromUser]
+	-- Add the parameters for the stored procedure here
+	@UserId int,
+	@BlockId Bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	IF ((SELECT COUNT (ID) FROM dbo.Locking WHERE UserId=@UserId AND BlockId=@BlockID)>0)
+    BEGIN
+	 UPDATE dbo.Locking SET time=GETDATE() WHERE BlockId=@BlockID
+    END
+    ELSE
+    BEGIN
+		INSERT INTO dbo.Locking(UserId,BlockId, time,UserName )
+		VALUES (@UserId, @BlockID, GETDATE(), (SELECT UserName FROM Users WHERE UserID=@UserId))
+    END
+	
+	
+	
+END
+
+
+
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vWeb_MediaForList]    Script Date: 03/17/2017 14:03:11 ******/
+
+
+CREATE VIEW [dbo].[vWeb_ArchiveMediaForList]
+AS
+SELECT     TOP (100) PERCENT Id, Name, BLockType, CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, BlockText, Ready, Approve, TextLang1, TextLang2, TextLang3, ParentId, Sort, 
+                      Description
+FROM         dbo.ArchBlocks
+WHERE     (deleted = 0) AND (ParentId > 0)
+ORDER BY Description
+
+GO
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tWeb_ArchiveBlockHistory](
+	[id] [nvarchar](90) NOT NULL,
+	[date] [datetime] NOT NULL,
+	[userId] [int] NOT NULL,
+	[blockZipText] [image] NOT NULL,
+	[blockId] [bigint] NOT NULL,
+ CONSTRAINT [PK_tWeb_ArchiveBlockHistory] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  Table [dbo].[tWeb_BlockHistory]    Script Date: 03/17/2017 16:52:04 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tWeb_BlockHistory](
+	[id] [nvarchar](90) NOT NULL,
+	[date] [datetime] NOT NULL,
+	[userId] [int] NOT NULL,
+	[blockZipText] [image] NOT NULL,
+	[blockId] [bigint] NOT NULL,
+ CONSTRAINT [PK_tWeb_BlockHistory] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+
+USE [NewsFactory]
+GO
+
+/****** Object:  Table [dbo].[tWeb_BlockHistory]    Script Date: 03/17/2017 16:50:45 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tWeb_ArchiveBlockHistory](
+	[id] [nvarchar](90) NOT NULL,
+	[date] [datetime] NOT NULL,
+	[userId] [int] NOT NULL,
+	[blockZipText] [image] NOT NULL,
+	[blockId] [bigint] NOT NULL,
+ CONSTRAINT [PK_tWeb_ArchiveBlockHistory] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+USE [NewsFactory]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_NewsToArchive]    Script Date: 03/17/2017 16:54:03 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_NewsToArchive] 
+@News_id  Bigint
+
+AS
+
+-- ????????? ?????? ? ????? ??????? ????????? ???? ???? ? ??????? ??????
+-- ??????? ???????? @News_id  - id ???????
+-- ?????  RETURN ??? ?????? ??? 0 ???? ??????? ??? 2 ???? 
+
+-- News_To_Archive
+
+DECLARE @rustv_err_status int
+DECLARE @err_status int
+
+IF ((SELECT rustv FROM programs WHERE [id] IN (SELECT programid FROM news WHERE [id]=@News_id))>0)
+EXECUTE @rustv_err_status = sp_NewsToOutbox 0, @News_id
+IF (@rustv_err_status <> 0) SET @rustv_err_status = @rustv_err_status*10
+
+BEGIN TRANSACTION NewsToArchive
+
+INSERT INTO ArcNews  ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, ProgramId, 
+			Cassete, Time_Code, Duration, Deleted)
+SELECT [id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+	ProgramId, Cassete, Time_Code, Duration, Deleted
+FROM News WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+INSERT INTO ArchBlocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, 
+			TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3)
+SELECT [Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, 
+	CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+FROM  Blocks WHERE NewsId=@News_id and deleted=0
+----------------------------------
+
+INSERT INTO dbo.tWeb_ArchiveBlockHistory
+SELECT * FROM  dbo.tWeb_BlockHistory
+WHERE blockId in (SELECT id FROM Blocks WHERE NewsId=@News_id and deleted=0)
+                 
+DELETE FROM   tWeb_BlockHistory 
+WHERE blockId in (SELECT id FROM Blocks WHERE NewsId=@News_id and deleted=0)
+              
+---------------------------------
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+
+
+/*
+DECLARE @Block_id BIGINT
+DECLARE stArchive CURSOR FOR SELECT [id] FROM Blocks WHERE ParentId IN (SELECT [Id] FROM  Blocks WHERE NewsId=@News_id and deleted=0)
+OPEN stArchive
+FETCH NEXT FROM stArchive INTO @Block_id
+WHILE @@fetch_status=0
+	BEGIN
+	DECLARE @ProgramID INT
+	DECLARE @AProgramId INT
+	DECLARE @APlaceId INT
+	SELECT id, Name, ParentId FROM Blocks WHERE ID=@Block_id
+	SELECT     @ProgramID=Programs.id  FROM         Blocks INNER JOIN 		                      News ON Blocks.NewsId = News.id INNER JOIN		                      Programs ON News.ProgramId = Programs.id		WHERE     (Blocks.Id = @Block_id)
+	SELECT     @APlaceId=ID FROM     NewsFactoryArchive.dbo.tPlace WHERE     (Name = (SELECT name FROM Blocks WHERE ID=@Block_id)) ORDER BY InsertDate DESC
+	SELECT     @AProgramId=ID FROM         NewsFactoryArchive.dbo.tProgram WHERE     (Deleted = 0) AND (FactoryId = @ProgramID)
+	IF ((@APlaceId IS NOT NULL) AND (@AProgramId IS NOT NULL))
+	BEGIN
+		DECLARE @AMaterialId BIGINT
+		DECLARE @Blocktext nvarchar(4000)
+		SELECT @Blocktext=convert(nvarchar(4000),BlockText) FROM BLOCKS WHERE ID=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		INSERT INTO NewsFactoryArchive.dbo.tMaterial (ProgramID, Description, Title ) SELECT @AProgramId ,@BlockText, Name   FROM BLOCKS WHERE ID=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		SELECT @AMaterialId=MAX(ID) FROM NewsFactoryArchive.dbo.tMaterial
+		UPDATE NewsFactoryArchive.dbo.tMaterial SET MaterialGroupID =(SELECT min(ID) FROM  NewsFactoryArchive.dbo.tMaterialGroup), MaterialTypeID=(SELECT min(ID) FROM  NewsFactoryArchive.dbo.tMaterialType) WHERE id=@AMaterialId
+		
+		
+		UPDATE NewsFactoryArchive.dbo.tMaterial SET BroadcastDate=(SELECT     2+convert(int, News.NewsDate)  FROM         Blocks INNER JOIN                       News ON Blocks.NewsId = News.id  WHERE     (Blocks.Id = (SELECT ParentId FROM BLOCKS WHERE ID=@Block_id))) WHERE id=@AMaterialId
+		
+
+
+		DECLARE @buf nvarchar(255)
+		SELECT     @buf=Users.UserName FROM         Blocks INNER JOIN  Users ON Blocks.CreatorId = Users.UserID WHERE Blocks.Id=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		
+		IF (@buf IS NOT NULL ) 
+		BEGIN
+			UPDATE NewsFactoryArchive.dbo.tMaterial SET Autor =@buf WHERE id=@AMaterialId
+		END		
+		SET @buf=NULL
+		SELECT     @buf=Users.UserName FROM         Blocks INNER JOIN  Users ON Blocks.OperatorId = Users.UserID WHERE Blocks.Id=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		IF( @buf IS NOT NULL ) 
+		BEGIN
+			UPDATE NewsFactoryArchive.dbo.tMaterial SET Cammen =@buf WHERE id=@AMaterialId
+		END
+		INSERT INTO NewsFactoryArchive.dbo.tMaterialToPlace(MaterialID, PlaceID, Timecode, FileName, Comments )
+		SELECT   @AMaterialId, @APlaceId,  BlockTime+570 ,convert(nvarchar(1024), BlockText), convert(nvarchar(255), Description ) FROM         Blocks WHERE     (ID=@Block_id)
+	END
+	FETCH NEXT FROM stArchive INTO @Block_id
+END
+CLOSE stArchive
+DEALLOCATE stArchive	
+
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+DELETE FROM blocks WHERE NewsId=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+*/
+DELETE FROM news WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+COMMIT TRANSACTION NewsToArchive
+
+
+RETURN @rustv_err_status
+
+go
+
+USE [NewsFactory]
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  Table [dbo].[tSocial_Message]    Script Date: 03/19/2017 14:21:18 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tSocial_Message](
+	[id] [nvarchar](90) NOT NULL,
+	[blockId] [bigint] NOT NULL,
+	[title] [nvarchar](max) NOT NULL,
+	[subtitle] [nvarchar](max) NOT NULL,
+	[message] [ntext] NOT NULL,
+	[updateTime] [datetime] NOT NULL,
+	[mediaId] [bigint] NOT NULL,
+	[mediaType] [int] NOT NULL,
+ CONSTRAINT [PK_tSocial_Message] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+
+
+/****** Object:  Table [dbo].[tSocial_Type]    Script Date: 03/18/2017 03:17:49 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tSocial_Type](
+	[id] [nvarchar](90) NOT NULL,
+	[title] [nvarchar](max) NOT NULL,
+	[deleted] [bit] NOT NULL,
+	[isTitle] [bit] NOT NULL,
+	[isLid] [bit] NOT NULL,
+	[isText] [bit] NOT NULL,
+	[isVideo] [bit] NOT NULL,
+	[isPhoto] [bit] NOT NULL,
+	[img] [nvarchar](max) NOT NULL,
+	[linkPrefix] [nvarchar](max) NOT NULL,
+	[linkPostfix] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_t_socialType] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_deleted]  DEFAULT ((0)) FOR [deleted]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_isTitle]  DEFAULT ((1)) FOR [isTitle]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_isLid]  DEFAULT ((1)) FOR [isLid]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_isText]  DEFAULT ((1)) FOR [isText]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_isVideo]  DEFAULT ((1)) FOR [isVideo]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_t_socialType_isPhoto]  DEFAULT ((1)) FOR [isPhoto]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_tSocial_Type_img]  DEFAULT ('') FOR [img]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_tSocial_Type_linkPrefix]  DEFAULT ('') FOR [linkPrefix]
+GO
+
+ALTER TABLE [dbo].[tSocial_Type] ADD  CONSTRAINT [DF_tSocial_Type_linkPostfix]  DEFAULT ('') FOR [linkPostfix]
+GO
+
+
+USE [NewsFactory]
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  Table [dbo].[tSocial_Feed]    Script Date: 03/19/2017 14:23:07 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tSocial_Feed](
+	[id] [nvarchar](90) NOT NULL,
+	[typeId] [nvarchar](90) NOT NULL,
+	[title] [nvarchar](max) NOT NULL,
+	[authKey] [nvarchar](max) NOT NULL,
+	[deleted] [bit] NOT NULL,
+ CONSTRAINT [PK_tSocial_Feed] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+
+
+
+
+/****** Object:  Table [dbo].[tSocial_feedToMessage]    Script Date: 03/18/2017 03:19:24 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tSocial_feedToMessage](
+	[id] [nvarchar](90) NOT NULL,
+	[feedId] [nvarchar](90) NOT NULL,
+	[socialMessId] [nvarchar](90) NOT NULL,
+	[insertDate] [datetime] NOT NULL,
+	[updateStatusDate] [datetime] NOT NULL,
+	[status] [int] NOT NULL,
+	[message] [ntext] NOT NULL,
+	[publishCount] [int] NOT NULL,
+	[socialId] [nvarchar](max) NOT NULL,
+	[socialError] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_tSocial_feedToMessage] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage]  WITH CHECK ADD  CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Feed] FOREIGN KEY([feedId])
+REFERENCES [dbo].[tSocial_Feed] ([id])
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] CHECK CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Feed]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage]  WITH CHECK ADD  CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Message] FOREIGN KEY([socialMessId])
+REFERENCES [dbo].[tSocial_Message] ([id])
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] CHECK CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Message]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_publishCount]  DEFAULT ((0)) FOR [publishCount]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_socialId]  DEFAULT ('') FOR [socialId]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_socialError]  DEFAULT ('') FOR [socialError]
+GO
+
+
+
+ALTER TABLE [dbo].[tSocial_Message] ADD  CONSTRAINT [DF_tSocial_Message_mediaType]  DEFAULT ((1)) FOR [mediaType]
+GO
+
+ALTER TABLE [dbo].[tSocial_Feed]  WITH CHECK ADD  CONSTRAINT [FK_tSocial_Feed_tSocial_Type] FOREIGN KEY([typeId])
+REFERENCES [dbo].[tSocial_Type] ([id])
+GO
+
+ALTER TABLE [dbo].[tSocial_Feed] CHECK CONSTRAINT [FK_tSocial_Feed_tSocial_Type]
+GO
+
+ALTER TABLE [dbo].[tSocial_Feed] ADD  CONSTRAINT [DF_t_socialFeed_deleted]  DEFAULT ((0)) FOR [deleted]
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vWeb_BlockForPrintTemplate]    Script Date: 03/22/2017 19:31:19 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vWeb_BlockForPrintTemplate]
+AS
+SELECT     dbo.Blocks.Id, dbo.Blocks.Name, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.OperatorId, dbo.Blocks.JockeyId, dbo.Blocks.BlockTime, dbo.Blocks.TaskTime, 
+                      dbo.Blocks.CalcTime, dbo.Blocks.BlockText, dbo.Blocks.Sort, dbo.Blocks.Description, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.BLockType, dbo.BlockType.TypeName, 
+                      dbo.Blocks.CutterId, dbo.Blocks.TextLang1, dbo.Blocks.TextLang2, dbo.Blocks.TextLang3
+FROM         dbo.Blocks INNER JOIN
+                      dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pWeb_UpdateLookingFromUser]    Script Date: 03/23/2017 17:17:03 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[pWeb_UpdateLookingFromUser]
+	-- Add the parameters for the stored procedure here
+	@UserId int,
+	@BlockId Bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	IF ((SELECT COUNT (ID) FROM dbo.Locking WHERE UserId=@UserId AND BlockId=@BlockID)>0)
+    BEGIN
+	 UPDATE dbo.Locking SET time=GETDATE()WHERE BlockId=@BlockID
+    END
+    ELSE
+    BEGIN
+		INSERT INTO dbo.Locking(UserId,BlockId, time,UserName )
+		VALUES (@UserId, @BlockID, GETDATE(), (SELECT UserName FROM Users WHERE UserID=@UserId))
+    END
+	
+	
+	
+END
+
+GO
+DECLARE @COUNT int
+
+SELECT @COUNT=COUNT(ID)from dbo.tWeb_Settings WHERE [key]='license'
+IF(@COUNT=0)
+BEGIN 
+	INSERT INTO dbo.tWeb_Settings ( [Key], value, Description)
+	VALUES('license','', 'license key' )
+END
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vWeb_UsersLoginList]    Script Date: 04/03/2017 02:19:49 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vWeb_UsersLoginList]
+AS
+SELECT     TOP (100) PERCENT 0 AS ProgramID, '-' AS ProgramName, dbo.Users.Active, dbo.Users.UserID, dbo.Users.UserName, dbo.Users.pass AS UserPass, dbo.Users.ReadRate AS UserRate, 
+                      dbo.Users.Last_time
+FROM         dbo.URightsToRole INNER JOIN
+                      dbo.URights ON dbo.URightsToRole.URightID = dbo.URights.URightID INNER JOIN
+                      dbo.URoles ON dbo.URightsToRole.URoleID = dbo.URoles.URoleID INNER JOIN
+                      dbo.UUserToProgram ON dbo.URoles.URoleID = dbo.UUserToProgram.URoleID INNER JOIN
+                      dbo.Users ON dbo.UUserToProgram.UserID = dbo.Users.UserID
+WHERE     (dbo.URights.URightID = 1) AND (dbo.Users.deleted = 0)
+GROUP BY dbo.Users.Active, dbo.Users.UserID, dbo.Users.UserName, dbo.Users.pass, dbo.Users.ReadRate, dbo.Users.Last_time
+ORDER BY dbo.Users.UserName, dbo.Users.UserID
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vWeb_UserRight]    Script Date: 04/03/2017 10:57:23 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vWeb_UserRight]
+AS
+SELECT     TOP (100) PERCENT dbo.Programs.id AS ProgramID, '-' AS ProgramName, dbo.URights.URightID AS RightID, dbo.Users.UserID, '-' AS UserPass, dbo.Users.ReadRate AS UserRate, 
+                      dbo.Users.UserName
+FROM         dbo.UUserToProgram INNER JOIN
+                      dbo.Users ON dbo.UUserToProgram.UserID = dbo.Users.UserID INNER JOIN
+                      dbo.URoles ON dbo.UUserToProgram.URoleID = dbo.URoles.URoleID INNER JOIN
+                      dbo.URightsToRole ON dbo.URoles.URoleID = dbo.URightsToRole.URoleID INNER JOIN
+                      dbo.URights ON dbo.URightsToRole.URightID = dbo.URights.URightID INNER JOIN
+                      dbo.Programs ON dbo.UUserToProgram.ProgramID = dbo.Programs.id
+WHERE     (dbo.Users.deleted = 0)
+GROUP BY dbo.Users.UserID, dbo.Programs.id, dbo.URights.URightID, dbo.Users.UserName, dbo.Users.ReadRate
+HAVING      (NOT (dbo.URights.URightID IN (1, 510)))
+ORDER BY dbo.Users.UserName, dbo.Users.UserID, ProgramID, RightID
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vUsersLoginList]    Script Date: 04/03/2017 12:44:15 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vUsersLoginList]
+AS
+SELECT     TOP (100) PERCENT 0 AS ProgramID, '-' AS ProgramName, dbo.Users.Active AS RightID, dbo.Users.UserID, dbo.Users.UserName, dbo.Users.pass AS UserPass, 
+                      dbo.Users.ReadRate AS UserRate
+FROM         dbo.URightsToRole INNER JOIN
+                      dbo.URights ON dbo.URightsToRole.URightID = dbo.URights.URightID INNER JOIN
+                      dbo.URoles ON dbo.URightsToRole.URoleID = dbo.URoles.URoleID INNER JOIN
+                      dbo.UUserToProgram ON dbo.URoles.URoleID = dbo.UUserToProgram.URoleID INNER JOIN
+                      dbo.Users ON dbo.UUserToProgram.UserID = dbo.Users.UserID
+WHERE     (dbo.URights.URightID = 1) AND (dbo.Users.deleted = 0)
+GROUP BY dbo.Users.Active, dbo.Users.UserID, dbo.Users.UserName, dbo.Users.pass, dbo.Users.ReadRate
+ORDER BY dbo.Users.UserName, dbo.Users.UserID
+
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vBlocks]    Script Date: 04/07/2017 00:34:39 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vBlocks]
+AS
+SELECT     TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, dbo.ConvertIntToCharTime(dbo.Blocks.BlockTime) AS BlockTime, 
+                      dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) AS TaskTime, dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, 
+                      dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.Sort, dbo.Blocks.OperatorId, dbo.Blocks.JockeyId, dbo.Blocks.CutterId
+FROM         dbo.Blocks LEFT OUTER JOIN
+                      dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE     (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vArchBlock_for_list]    Script Date: 04/07/2017 00:37:46 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vArchBlock_for_list]
+AS
+SELECT     TOP (100) PERCENT dbo.ArchBlocks.Id, dbo.ArchBlocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, dbo.ConvertIntToCharTime(dbo.ArchBlocks.BlockTime) AS BlockTime, 
+                      dbo.ConvertIntToCharTime(dbo.ArchBlocks.TaskTime) AS TaskTime, dbo.ConvertIntToCharTime(dbo.ArchBlocks.CalcTime) AS CalcTime, dbo.ArchBlocks.NewsId, dbo.ArchBlocks.ParentId, 
+                      dbo.ArchBlocks.CreatorId, dbo.ArchBlocks.Ready, dbo.ArchBlocks.Approve, dbo.ArchBlocks.Sort, dbo.ArchBlocks.OperatorId, dbo.ArchBlocks.JockeyId, dbo.ArchBlocks.CutterId
+FROM         dbo.ArchBlocks LEFT OUTER JOIN
+                      dbo.BlockType ON dbo.ArchBlocks.BLockType = dbo.BlockType.id
+WHERE     (dbo.ArchBlocks.Deleted = 0)
+ORDER BY dbo.ArchBlocks.Sort
+
+GO
+
+CREATE PROCEDURE pWeb_ClearRss
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	DECLARE @count int
+	SELECT @count= count(id) FROM [dbo].[tWeb_IncomingRssMessages]
+	IF(@count>10000)
+	BEGIN
+	DELETE FROM tWeb_IncomingRssMessages WHERE ID IN(SELECT TOP (@count-1000) ID FROM tWeb_IncomingRssMessages ORDER BY DATE)
+	END
+END
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  StoredProcedure [dbo].[pWeb_CopyBlockGroupsTONewNews]    Script Date: 05/02/2017 23:49:48 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[pWeb_CopyBlockGroupsTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	DECLARE @GroupCount INT
+	SELECT  @GroupCount=COUNT(id)  FROM [Blocks] WHERE (TextLang3 not like '0' OR TextLang3 not like '') and Id=@BlocksId
+	if(@GroupCount=0)
+	BEGIN
+		EXEC pWeb_CopyBlockTONewNews @BlocksId, @NewNewsId
+		RETURN
+	END
+	DECLARE @CurrNewsId BIGINT
+	SELECT @CurrNewsId=NewsID FROM [Blocks] Where ID=@BlocksId
+	DECLARE @i int
+	set @i=0
+	----
+	DECLARE @CurrBlockId bigint 
+	DECLARE stBl cursor FOR SELECT [id] FROM Blocks WHERE NewsId=@CurrNewsId AND Deleted=0 AND ParentId=0 AND TextLang3 LIKE (SELECT TextLang3 FROM BLOCKS WHERE ID=@BlocksId ) ORDER BY Sort
+	OPEN stBl
+	FETCH NEXT FROM stBl INTO @CurrBlockId
+	WHILE @@fetch_status=0
+	BEGIN
+		
+		EXEC pWeb_CopyBlockTONewNewsWITHnoSORT @CurrBlockId,  @NewNewsId, @i
+		SET @i=@i+1
+		FETCH NEXT FROM stBl INTO @CurrBlockId
+	END
+
+	CLOSE stBl
+	DEALLOCATE stBl
+
+EXECUTE [sp_SortBlocks] @NewnewsId
+END
+GO
+
+ALTER TABLE 
+[NewsFactory].[dbo].[tWeb_MediaTask]
+ADD  isComplite bit not null default 0
+
+GO
+
+USE [NewsFactory]
+GO
+/****** Object:  StoredProcedure [dbo].[pMedia_SetTaskUploadComplite]    Script Date: 07/01/2017 21:06:48 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pMedia_SetTaskUploadComplite]
+	@taskId  int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    UPDATE dbo.tWeb_MediaTask SET DateAddComplite=GETDATE(),isComplite=1 WHERE ID=@taskId
+END
+GO
+
+ALTER VIEW [dbo].[vMedia_ListForGenerateImages]
+AS
+SELECT     TOP (100) PERCENT dbo.tWeb_MediaTask.id, dbo.Blocks.BlockText AS PicSource
+FROM         dbo.Blocks INNER JOIN
+                      dbo.tWeb_MediaTask ON dbo.Blocks.Id = dbo.tWeb_MediaTask.MediaId
+WHERE     (dbo.Blocks.BLockType = 1) AND ( dbo.tWeb_MediaTask.isComplite=1)  AND (dbo.tWeb_MediaTask.DateAddComplite IS NOT NULL) AND (dbo.tWeb_MediaTask.PICCount < 6)
+ORDER BY dbo.tWeb_MediaTask.DateAdd DESC, dbo.tWeb_MediaTask.PICCount
+
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vMedia_ListForGenerateLRV]    Script Date: 07/01/2017 21:18:04 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vMedia_ListForGenerateLRV]
+AS
+SELECT     TOP (100) PERCENT dbo.tWeb_MediaTask.id, dbo.Blocks.BlockText AS PicSource, dbo.tWeb_MediaTask.LRVStatus
+FROM         dbo.Blocks INNER JOIN
+                      dbo.tWeb_MediaTask ON dbo.Blocks.Id = dbo.tWeb_MediaTask.MediaId
+WHERE     (dbo.Blocks.BLockType = 2) AND ( dbo.tWeb_MediaTask.isComplite=1) AND (DATEADD(second, 5, dbo.tWeb_MediaTask.DateAdd) < GETDATE()) AND (dbo.tWeb_MediaTask.LRVStatus < 1) AND (dbo.tWeb_MediaTask.LRVCount < 5)
+ORDER BY dbo.tWeb_MediaTask.DateAdd DESC, dbo.tWeb_MediaTask.PICCount
+
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vMedia_ListForGenerateTh]    Script Date: 07/01/2017 21:18:48 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vMedia_ListForGenerateTh]
+AS
+SELECT     TOP (100) PERCENT dbo.tWeb_MediaTask.id, dbo.Blocks.BlockText AS PicSource
+FROM         dbo.Blocks INNER JOIN
+                      dbo.tWeb_MediaTask ON dbo.Blocks.Id = dbo.tWeb_MediaTask.MediaId
+WHERE     (dbo.tWeb_MediaTask.PICStatus < 1) AND ( dbo.tWeb_MediaTask.isComplite=1)  AND (dbo.Blocks.BLockType = 2) AND (DATEADD(second, 5, dbo.tWeb_MediaTask.DateAdd) < GETDATE()) AND (dbo.tWeb_MediaTask.PICCount < 5)
+ORDER BY dbo.tWeb_MediaTask.DateAdd DESC, dbo.tWeb_MediaTask.PICCount
+
+GO
+
+/* Чтобы предотвратить возможность потери данных, необходимо внимательно просмотреть этот сценарий, прежде чем запускать его вне контекста конструктора баз данных.*/
+BEGIN TRANSACTION
+SET QUOTED_IDENTIFIER ON
+SET ARITHABORT ON
+SET NUMERIC_ROUNDABORT OFF
+SET CONCAT_NULL_YIELDS_NULL ON
+SET ANSI_NULLS ON
+SET ANSI_PADDING ON
+SET ANSI_WARNINGS ON
+COMMIT
+BEGIN TRANSACTION
+GO
+ALTER TABLE dbo.Messages
+	DROP CONSTRAINT DF_Messages_text
+GO
+CREATE TABLE dbo.Tmp_Messages
+	(
+	id bigint NOT NULL IDENTITY (1, 1),
+	[from] int NULL,
+	[to] int NOT NULL,
+	text ntext NOT NULL,
+	data datetime NULL
+	)  ON [PRIMARY]
+	 TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE dbo.Tmp_Messages SET (LOCK_ESCALATION = TABLE)
+GO
+ALTER TABLE dbo.Tmp_Messages ADD CONSTRAINT
+	DF_Messages_text DEFAULT ('нет текста') FOR text
+GO
+SET IDENTITY_INSERT dbo.Tmp_Messages ON
+GO
+IF EXISTS(SELECT * FROM dbo.Messages)
+	 EXEC('INSERT INTO dbo.Tmp_Messages (id, [from], [to], text, data)
+		SELECT id, [from], [to], CONVERT(ntext, text), data FROM dbo.Messages WITH (HOLDLOCK TABLOCKX)')
+GO
+SET IDENTITY_INSERT dbo.Tmp_Messages OFF
+GO
+DROP TABLE dbo.Messages
+GO
+EXECUTE sp_rename N'dbo.Tmp_Messages', N'Messages', 'OBJECT' 
+GO
+ALTER TABLE dbo.Messages ADD CONSTRAINT
+	PK_Messages PRIMARY KEY CLUSTERED 
+	(
+	id
+	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+
+GO
+CREATE TRIGGER [Messages update] ON dbo.Messages 
+FOR INSERT
+AS
+UPDATE Messages SET data = GetDate() WHERE [id] in (SELECT [id] FROM inserted)
+GO
+USE [NewsFactory]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fWeb_MediaStatusFromBlock]    Script Date: 07/05/2017 00:44:00 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date, ,>
+-- Description:	<Description, ,>
+-- =============================================
+CREATE FUNCTION [dbo].[fWeb_MediaStatusFromBlock]
+(
+	-- Add the parameters for the function here
+	@blockId bigint
+)
+RETURNS int
+AS
+BEGIN
+DECLARE @COUNT int
+SELECT @COUNT=count(id) FROM BLOCKS WHERE parentId=@BlockId AND deleted=0 AND blockType>0
+IF (@COUNT<1) RETURN -1
+
+DECLARE @READY int
+DECLARE @APPROVE int
+
+
+SELECT TOP 1  @READY =ready , @APPROVE= approve FROM BLOCKS WHERE parentId=@BlockId AND deleted=0 AND blockType>0 ORDER BY SORT
+
+
+RETURN @READY+@APPROVE
+
+END
+
+GO
+
+
+GO
+
+
+
+
+
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT     TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                      dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) 
+                      AS TaskTime, dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.Ready, dbo.Blocks.Approve, 
+                      dbo.Blocks.Sort, dbo.fWeb_GetLockUserName(dbo.Blocks.Id) AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus
+FROM         dbo.Blocks LEFT OUTER JOIN
+                      dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE     (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[fWeb_GetUnApprovedFileNames]    Script Date: 07/05/2017 12:10:15 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE FUNCTION [dbo].[fWeb_GetUnApprovedFileNames]
+(	
+	-- Add the parameters for the function here
+	@dayOld int
+)
+RETURNS TABLE 
+AS
+RETURN 
+(
+	SELECT     Blocks_1.BlockText
+FROM         dbo.Blocks INNER JOIN
+                      dbo.News ON dbo.Blocks.NewsId = dbo.News.id INNER JOIN
+                      dbo.Blocks AS Blocks_1 ON dbo.Blocks.Id = Blocks_1.ParentId
+WHERE     (Blocks_1.Approve = 0) AND (dbo.News.NewsDate < GETDATE() - @dayOld)
+)
+
+GO
+
+
+
+
+
+
+
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date, ,>
+-- Description:	<Description, ,>
+-- =============================================
+CREATE FUNCTION [dbo].[fWeb_MediaStatusFromBlock]
+(
+	-- Add the parameters for the function here
+	@blockId bigint
+)
+RETURNS int
+AS
+BEGIN
+DECLARE @COUNT int
+SELECT @COUNT=count(id) FROM BLOCKS WHERE parentId=@BlockId AND deleted=0 AND blockType>0
+IF (@COUNT<1) RETURN -1
+
+DECLARE @READY int
+DECLARE @APPROVE int
+
+
+SELECT TOP 1  @READY =ready , @APPROVE= approve FROM BLOCKS WHERE parentId=@BlockId AND deleted=0 AND blockType>0 ORDER BY SORT
+
+
+RETURN @READY+@APPROVE
+
+END
+
+go
+
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT     TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                      dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) 
+                      AS TaskTime, dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.Ready, dbo.Blocks.Approve, 
+                      dbo.Blocks.Sort, dbo.fWeb_GetLockUserName(dbo.Blocks.Id) AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus
+FROM         dbo.Blocks LEFT OUTER JOIN
+                      dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE     (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+
+go
+ALTER PROCEDURE [dbo].[pWeb_SendMessage]
+	
+	@UserFrom int,
+	@UserTo int,
+	@text ntext
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	INSERT INTO Messages([from],[to],[text],data) 
+	VALUES (@UserFrom,@UserTo,@text, GETDATE());
+END
+go
+ALTER PROCEDURE [dbo].[pWeb_ReplyMessage]
+	-- Add the parameters for the stored procedure here
+	@FromUserId int,
+	@MessageId int,
+	@Text ntext
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @ToUserId int
+
+DECLARE @textlen bigint 
+ SELECT @textlen= DATALENGTH(@Text)
+ IF @textlen>0
+ BEGIN
+	 SELECT @ToUserId=[from] FROM dbo.Messages WHERE ID=@MessageId
+	 INSERT INTO dbo.Messages([FROM], [to], text, [data]) VALUES
+	 (@FromUserId,@ToUserId, @Text, GETDATE())
+ END
+ DELETE FROM dbo.Messages WHERE ID=@MessageId
+
+END
+GO
+
+USE [NewsFactory]
+GO
+/****** Object:  StoredProcedure [dbo].[pWeb_CopyBlockGroupsTONewNews]    Script Date: 11/03/2017 17:29:56 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockGroupsTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	DECLARE @GroupCount INT
+	SELECT @GroupCount=COUNT(id)  FROM [Blocks] WHERE (not(datalength(TextLang3)=0 OR TextLang3 like '0' )) and Id=@BlocksId
+if(@GroupCount=0)
+	BEGIN
+		EXEC pWeb_CopyBlockTONewNews @BlocksId, @NewNewsId
+		RETURN
+	END
+	DECLARE @CurrNewsId BIGINT
+	SELECT @CurrNewsId=NewsID FROM [Blocks] Where ID=@BlocksId
+	DECLARE @i int
+	set @i=0
+	----
+	DECLARE @CurrBlockId bigint 
+	DECLARE stBl cursor FOR SELECT [id] FROM Blocks WHERE NewsId=@CurrNewsId AND Deleted=0 AND ParentId=0 AND TextLang3 LIKE (SELECT TextLang3 FROM BLOCKS WHERE ID=@BlocksId ) ORDER BY Sort
+	OPEN stBl
+	FETCH NEXT FROM stBl INTO @CurrBlockId
+	WHILE @@fetch_status=0
+	BEGIN
+		
+		EXEC pWeb_CopyBlockTONewNewsWITHnoSORT @CurrBlockId,  @NewNewsId, @i
+		SET @i=@i+1
+		FETCH NEXT FROM stBl INTO @CurrBlockId
+	END
+
+	CLOSE stBl
+	DEALLOCATE stBl
+
+EXECUTE [sp_SortBlocks] @NewnewsId
+END
+GO
+
+
+ALTER PROCEDURE [dbo].[pWeb_NewNews]
+	@programId bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	
+	DECLARE @NewId bigint
+	SELECT @NewId=convert(bigint,rand()*100000000)
+	INSERT INTO News (id, Name, NewsDate, ProgramId, EditorId ) VALUES (@NewId, 'Новый выпуск', DATEADD(day,1,GETDATE()), @programId,0)
+RETURN @NewId
+	
+END
+
+GO
+
+ALTER FUNCTION [dbo].[fWeb_GetLockUserName]
+(
+	@BlockId bigint
+)
+RETURNS nvarchar(255)
+AS
+BEGIN
+	
+	DECLARE @UserName nvarchar(255)
+	SELECT    top (1)  @UserName=UserName
+                            FROM          dbo.Locking
+                            WHERE      (BlockId = @BlockId) AND dateadd(second, -4, GETDATE())<time
+                            
+     return ISNULL(@Username,'')
+
+END
+
+GO
+
+ALTER PROCEDURE [dbo].[pWeb_NewBlock]
+	@NewsId bigint,
+	@AfterBlockId  bigint
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @NewId int
+	DECLARE @Sort int
+	SET @Sort=0;
+	SELECT @NewId=convert(bigint,rand()*100000000)
+	IF @AfterBlockId>0
+	BEGIN
+	SELECT @Sort=Sort+5 FROM BLOCKS WHERE ID=@AfterBlockId
+		IF @Sort IS NULL
+		BEGIN
+			SET @Sort=0
+		END
+	END
+	
+	INSERT INTO Blocks(Id, Name, NewsId, Sort, BLockType) VALUES (@NewId, ' -- ',@NewsId, @Sort, (select top 1 id from BlockType where Extern=0) )
+	EXECUTE [sp_SortBlocks] @newsId
+	
+RETURN @NewId
+	
+END
+GO
+
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+DECLARE @SortOrder int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name + ' - copy', @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId  and deleted=0) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId  and deleted=0
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1,TextLang2,TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+GO
+
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1, TextLang2, TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1, TextLang2, TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	--EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+
+
+CREATE PROCEDURE pWeb_AutoArchive
+AS
+BEGIN
+		DECLARE @NewsId BIGINT
+		DECLARE stAutoArchive CURSOR FOR SELECT [id] FROM NEWS WHERE NewsDate< GetDate()-10 
+		OPEN stAutoArchive
+		FETCH NEXT FROM stAutoArchive INTO @NewsId
+		BEGIN 
+			exec dbo.sp_NewsToArchive @NewsId
+			FETCH NEXT FROM stAutoArchive INTO @NewsId
+		END
+		CLOSE stAutoArchive
+		DEALLOCATE stAutoArchive
+END
+GO
+
+CREATE PROCEDURE pMedia_SortAlphablet
+@parentId bigint
+AS
+BEGIN
+		DECLARE @mediaId BIGINT
+		DECLARE @i INT
+		SET @i=0
+		
+		DECLARE SortAlphablet CURSOR FOR SELECT [id] FROM blocks WHERE parentId=@parentId ORDER BY  ready DESC, approve DESC, name ASC
+		OPEN SortAlphablet
+		FETCH NEXT FROM SortAlphablet INTO @mediaId
+		WHILE @@fetch_status=0
+		BEGIN 
+			SET @i=@i+10
+
+			UPDATE Blocks SET Sort=@i WHERE ID=@mediaId
+			FETCH NEXT FROM SortAlphablet INTO @mediaId
+		END
+		CLOSE SortAlphablet
+		DEALLOCATE SortAlphablet
+END
+GO
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0 
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId  and deleted=0) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId  and deleted=0
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1, TextLang2, TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1, TextLang2, TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	exec dbo.sp_UpdateNewsHrono @NewBlockId
+END
+
+RETURN @NewBlockId
+END
+
+
+
+GO
+
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1, TextLang2, TextLang3)
+			SELECT convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999), [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1, TextLang2, TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	exec dbo.sp_UpdateNewsHrono @NewBlockId
+END
+
+RETURN @NewBlockId
+END
+
+
+
+GO
+ALTER PROCEDURE [dbo].[pWeb_NewBlock]
+	@NewsId bigint,
+	@AfterBlockId  bigint,
+	@UserId int
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @NewId int
+	DECLARE @Sort int
+	SET @Sort=0;
+	SELECT @NewId=convert(bigint,rand()*100000000)
+	IF @AfterBlockId>0
+	BEGIN
+	SELECT @Sort=Sort+5 FROM BLOCKS WHERE ID=@AfterBlockId
+		IF @Sort IS NULL
+		BEGIN
+			SET @Sort=0
+		END
+	END
+	
+	INSERT INTO Blocks(Id, Name, NewsId, Sort, BLockType, CreatorId ) VALUES (@NewId, ' -- ',@NewsId, @Sort, (select top 1 id from BlockType where Extern=0), @UserId )
+	EXECUTE [sp_SortBlocks] @newsId
+	
+RETURN @NewId
+	
+END
+GO
+
+ALTER FUNCTION [dbo].[fWeb_ProgramIdFromBlockId]
+(
+	-- Add the parameters for the function here
+	@BlockId bigint
+)
+RETURNS bigint
+AS
+BEGIN
+	Declare @NewsId bigint
+	SELECT @NewsId=NewsId FROM Blocks WHERE Id=@BlockId
+	
+	DECLARE @ProgramId bigint
+	SELECT @ProgramId=ProgramId FROM News WHERE ID=@NewsId
+	IF(@programId is null)
+	BEGIN
+		SELECT top 1 @ProgramId=id FROM Programs WHERE DELETED=0 AND id>0 ORDER BY ID
+	END
+	RETURN @ProgramId
+
+END
+GO
+ALTER VIEW [dbo].[vWeb_ArchiveSearch]
+AS
+SELECT     TOP (100) PERCENT dbo.ArcNews.id AS NewsId, dbo.ArcNews.Name AS NewsName, dbo.ArcNews.NewsDate, dbo.ArcNews.Description AS NewsDescription, dbo.ArcNews.ProgramId, 
+                      dbo.ArchBlocks.Id AS BlockId, dbo.ArchBlocks.CreatorId, dbo.ArchBlocks.BlockText, dbo.ArchBlocks.Description, dbo.ArchBlocks.Name AS BlockName, dbo.ArchBlocks.ParentId, 
+                      dbo.ArchBlocks.NewsId AS Expr1, dbo.ArchBlocks.Sort as Sort
+FROM         dbo.ArcNews INNER JOIN
+                      dbo.ArchBlocks ON dbo.ArcNews.id = dbo.ArchBlocks.NewsId
+WHERE     (dbo.ArcNews.Deleted = 0) AND (dbo.ArchBlocks.ParentId = 0) AND (dbo.ArchBlocks.Deleted = 0)
+ORDER BY dbo.ArcNews.NewsDate DESC
+
+GO
+CREATE TABLE [dbo].[tWeb_PlayOutsType](
+	[id] [nvarchar](90) NOT NULL,
+	[Title] [nvarchar](max) NOT NULL,
+	[isDeleted] [bit] NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOutsType] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[tWeb_PlayOutsType] ADD  CONSTRAINT [DF_tWeb_PlayOutsType_isDeleted]  DEFAULT ((0)) FOR [isDeleted]
+GO
+CREATE TABLE [dbo].[tWeb_PlayOuts](
+	[id] [nvarchar](90) NOT NULL,
+	[typeId] [nvarchar](90) NOT NULL,
+	[Title] [nvarchar](max) NOT NULL,
+	[Path] [nvarchar](max) NOT NULL,
+	[replacePath] [nvarchar](max) NOT NULL,
+	[URL] [nvarchar](max) NOT NULL,
+	[isDeleted] [bit] NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOuts] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+ALTER TABLE dbo.tWeb_PlayOuts ADD CONSTRAINT
+	FK_tWeb_PlayOuts_tWeb_PlayOutsType1 FOREIGN KEY
+	(
+	typeId
+	) REFERENCES dbo.tWeb_PlayOutsType
+	(
+	id
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+	
+GO
+ALTER TABLE dbo.tWeb_PlayOuts SET (LOCK_ESCALATION = TABLE)
+GO
+INSERT INTO tWeb_PlayOutsType(id, title, isDeleted) VALUES('vMix', 'vMix', 0)
+GO
+CREATE TABLE [dbo].[tWeb_PlayOutTasks](
+	[id] [nvarchar](90) NOT NULL,
+	[serverId] [nvarchar](90) NOT NULL,
+	[dateCreate] [datetime] NOT NULL,
+	[status] [int] NOT NULL,
+	[description] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOutTasks] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+CREATE TABLE [dbo].[tWeb_PlayOutTaskFiles](
+	[id] [nvarchar](90) NOT NULL,
+	[taskId] [nvarchar](90) NOT NULL,
+	[fileName] [nvarchar](max) NOT NULL,
+	[fileTitle] [nvarchar](max) NOT NULL,
+	[status] [int] NOT NULL,
+	[description] [int] NOT NULL,
+	[bytes] [bigint] NOT NULL,
+	[date] [datetime] NOT NULL,
+	[bytesSend] [bigint] NOT NULL,
+	[sort] [int] NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOutTaskFiles] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+CREATE TABLE [dbo].[tWeb_TitleOuts](
+	[id] [nvarchar](90) NOT NULL,
+	[Title] [nvarchar](max) NOT NULL,
+	[css] [ntext] NOT NULL,
+	[isDeleted] [bit] NOT NULL,
+ CONSTRAINT [PK_tWeb_TitleOuts] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tWeb_TitleOuts] ADD  CONSTRAINT [DF_tWeb_TitleOuts_Title]  DEFAULT ('') FOR [Title]
+GO
+
+ALTER TABLE [dbo].[tWeb_TitleOuts] ADD  CONSTRAINT [DF_tWeb_TitleOuts_css]  DEFAULT ('') FOR [css]
+GO
+
+ALTER TABLE [dbo].[tWeb_TitleOuts] ADD  CONSTRAINT [DF_tWeb_TitleOuts_isDeleted]  DEFAULT ((0)) FOR [isDeleted]
+GO
+ALTER PROCEDURE [dbo].[sp_NewsFromCopyboxTemplate] 
+@News_Id bigint,
+@EditorId int,
+@ProgramId int
+
+AS
+
+-- ???????? ?? ??????? ??? ????????? ?? ??????? ??????
+-- ????? RETURN 0- ??, 1- ?????? ???????, 2 - ?????? ??????? ???????
+
+-- News_from_copybox_template
+
+DECLARE @New_News_id bigint
+DECLARE @Block_id bigint
+DECLARE @New_block_id bigint
+DECLARE @Subblock_id bigint
+DECLARE @New_subblock_id bigint
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+BEGIN TRANSACTION NewsFromCopyboxTemplate
+
+
+SET @Error_Num=2627
+SET @Error_Count=0
+WHILE (@Error_Num=2627) and (@Error_Count <10) 
+BEGIN
+	SET @Error_Count=@Error_Count+1
+	SET @New_News_id=convert(bigint,rand()*1000000000000000) 
+	INSERT INTO News ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+				ProgramId, Deleted, Cassete, Time_Code, Duration)
+	SELECT @New_News_id, [Name], @EditorId, GetDate()+1, [Description], NewsTime, CalcTime, TaskTime, 
+		@ProgramId, Deleted, Cassete, Time_Code, Duration FROM CopyNews WHERE ([id] = @News_Id)
+	SET @Error_Num=@@ERROR
+END
+IF  @Error_Num <> 0 
+BEGIN
+	ROLLBACK TRANSACTION NewsFromCopyboxTemplate
+	RETURN 1
+END
+
+DECLARE st cursor FOR SELECT [id] FROM Blocks WHERE newsid = @News_Id  and ParentId=0 AND deleted=0
+OPEN st
+FETCH NEXT FROM st INTO @Block_id
+WHILE @@fetch_status=0
+BEGIN
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+	BEGIN
+		SET @Error_Count=@Error_Count+1
+		SET @New_block_id=convert(bigint,rand()*1000000000000000) 
+		INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+				JockeyId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+				Ready, Approve, TextLang1,TextLang2,TextLang3  )
+		SELECT @New_block_id, [Name], @New_News_id, ParentId, BLockType, CreatorId, OperatorId, 
+			JockeyId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3  
+		FROM  Blocks WHERE [id]=@Block_id and deleted=0
+	        SET @Error_Num=@@ERROR
+	END
+	IF  @Error_Num <> 0 
+	BEGIN
+		CLOSE st
+		DEALLOCATE st			
+		ROLLBACK TRANSACTION NewsFromCopyboxTemplate
+		RETURN 1
+	END
+
+	IF(SELECT count([id]) FROM blocks WHERE ParentId=@Block_id) > 0
+	BEGIN
+		DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE  ParentId=@Block_id
+		OPEN st1
+		FETCH NEXT FROM st1 INTO @Subblock_id
+		WHILE @@fetch_status=0
+    		BEGIN
+			SET @Error_Num=2627
+			SET @Error_Count=0
+			WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+			BEGIN
+				SET @Error_Count=@Error_Count+1
+				SET @New_subblock_id= convert(bigint,rand()*1000000000000000) 
+				INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, 
+							OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+							BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3)
+				SELECT @New_subblock_id, [Name], @New_News_id, @New_block_id, BLockType, 
+					CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+					BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+				FROM  Blocks WHERE [id]=@Subblock_id and deleted=0
+				SET @Error_Num=@@ERROR
+			END
+			IF  @Error_Num <> 0 
+			BEGIN
+				CLOSE st
+
+				DEALLOCATE st
+
+				CLOSE st1
+
+				DEALLOCATE st1
+
+				ROLLBACK TRANSACTION NewsFromCopyboxTemplate
+				RETURN 1
+			END
+			FETCH NEXT FROM st1 INTO @Subblock_id
+		END
+		CLOSE st1
+		DEALLOCATE st1
+	END
+	FETCH NEXT FROM st INTO @Block_id
+END
+CLOSE st
+DEALLOCATE st
+COMMIT TRANSACTION NewsFromCopyboxTemplate
+
+IF ((SELECT GroupID FROM CopyNews WHERE ([id] = @News_Id))<100)
+BEGIN
+	BEGIN TRANSACTION DeleteFromCopybox
+	DELETE FROM CopyNews WHERE [id]=@News_Id
+	SET @Error_Num=@@ERROR
+	IF  @Error_Num <> 0 
+	BEGIN
+		ROLLBACK TRANSACTION DeleteFromCopybox
+		RETURN 2
+	END
+
+	DELETE FROM Blocks WHERE NewsId=@News_Id
+	SET @Error_Num=@@ERROR
+	IF  @Error_Num <> 0 
+	BEGIN
+		ROLLBACK TRANSACTION DeleteFromCopybox
+		RETURN 2
+	END
+	COMMIT TRANSACTION DeleteFromCopybox
+END
+
+RETURN 0
+
+GO
+ALTER PROCEDURE [dbo].[sp_NewsToCopybox]
+@News_id  Bigint,
+@GroupId Bigint,
+@UserId Bigint
+
+AS
+
+-- ????????? ??????????? ??????? ?? ?????????? ???????? ? ??????? ??? ???????
+-- ???????? ????????? @News_id - ????? ?????? ???????? @GroupId - ????????? ? ????? ?????? ?????????? ??? ??? ??? ?????? ? 
+-- ????????, @UserId - ? ?????? ?????? ??????? ????????? ? ??? ?????? ??????? ??????????
+-- ????????? ???????? RETURN - ??? ?????? - ???? 0 ?? ???????
+
+-- News_to_copyBox
+
+DECLARE @New_CopyNews_id bigint
+DECLARE @Block_id bigint
+DECLARE @New_Block_id bigint
+DECLARE @New_Subblock_id bigint
+DECLARE @Subblock_id bigint
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+
+BEGIN TRANSACTION NewsToCopyNews
+
+SET @Error_Num=2627
+SET @Error_Count=0
+WHILE (@Error_Num=2627) and (@Error_Count <10) 
+BEGIN
+        SET @New_CopyNews_id = (convert(bigint,rand()*1000000000000000))
+	SET @Error_Count=@Error_Count+1
+	INSERT INTO CopyNews ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+				ProgramId, Deleted, Cassete, Time_Code, Duration, GroupID)
+	SELECT @New_CopyNews_id, [Name], @UserId, NewsDate, [Description], NewsTime, CalcTime, 
+		TaskTime, ProgramId, Deleted, Cassete, Time_Code, Duration,@GroupId 
+	FROM News WHERE ([id] = @News_id)
+	SET @Error_Num=@@ERROR
+END
+if  @Error_Num <> 0 
+BEGIN
+	ROLLBACK TRANSACTION NewsToCopyNews
+	RETURN 1
+END
+-- ???? ?? ??????? ???? ?????? ???????
+DECLARE st cursor FOR SELECT [id] FROM Blocks where newsid = @News_id  AND ParentId=0 AND deleted=0
+OPEN st
+FETCH NEXT FROM st INTO @Block_id
+WHILE @@fetch_status=0
+BEGIN
+
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+		BEGIN
+			SET @Error_Count=@Error_Count+1
+			SET @New_Block_id=(convert(bigint,rand()*1000000000000000))
+     			INSERT INTO Blocks  ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready,  Approve, TextLang1,TextLang2,TextLang3)
+			SELECT @New_Block_id, [Name], @New_CopyNews_id, ParentId, BLockType, CreatorId, OperatorId, 
+				JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks where id=@Block_id
+			SET @Error_Num=@@ERROR
+		END
+		IF  @Error_Num <> 0 
+		BEGIN
+			CLOSE st
+			DEALLOCATE st			
+			ROLLBACK TRANSACTION NewsToCopyNews
+			RETURN 1
+		END
+-- ???? ?? ??????? ???? ??????????? ?????? ?????
+	IF(SELECT count([id]) FROM blocks WHERE ParentId=@Block_id) > 0
+	BEGIN
+		DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE  ParentId=@Block_id
+		OPEN st1
+		FETCH NEXT FROM st1 INTO @Subblock_id
+		WHILE @@fetch_status=0
+    		BEGIN
+
+			SET @Error_Num=2627
+			SET @Error_Count=0
+			WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+				BEGIN
+					SET @Error_Count=@Error_Count+1
+					SET @New_Subblock_id= (convert(bigint,rand()*1000000000000000))
+					INSERT INTO Blocks ([Id], [Name], ParentId, NewsId, BLockType, CreatorId, 
+								OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+								BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3)
+					SELECT @New_Subblock_id, [Name], @New_Block_id, @New_CopyNews_id, BLockType, 
+						CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+						BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+					FROM  Blocks WHERE [id]=@Subblock_id
+					SET @Error_Num=@@ERROR
+				END
+			IF  @Error_Num <> 0 
+				BEGIN
+					CLOSE st
+
+					DEALLOCATE st
+
+					CLOSE st1
+
+					DEALLOCATE st1
+
+					ROLLBACK TRANSACTION NewsToCopyNews
+					RETURN 1
+				END
+			FETCH NEXT FROM st1 INTO @Subblock_id
+		END
+		CLOSE st1
+		DEALLOCATE st1
+	END
+	FETCH NEXT FROM st INTO @Block_id
+END                 
+CLOSE st
+DEALLOCATE st
+COMMIT TRANSACTION NewsToCopyNews
+RETURN 0
+GO
+
+
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT        TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                         dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) AS TaskTime, 
+                         dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.Sort, 
+                         dbo.fWeb_GetLockUserName(dbo.Blocks.Id) AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus, dbo.Blocks.CutterId
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE        (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+GO
+
+ALTER VIEW [dbo].[vWeb_BlockToExtView]
+AS
+SELECT        dbo.Blocks.Name, dbo.Users.UserName AS Creator, Users_1.UserName AS Operator, Users_2.UserName AS Jockey, Users_3.UserName AS Cutter, dbo.Blocks.BlockText, dbo.Blocks.Description, dbo.Blocks.Ready, 
+                         dbo.Blocks.Approve, dbo.Blocks.Id
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.Users AS Users_3 ON dbo.Blocks.CutterId = Users_3.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_2 ON dbo.Blocks.JockeyId = Users_2.UserID LEFT OUTER JOIN
+                         dbo.Users ON dbo.Blocks.CreatorId = dbo.Users.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_1 ON dbo.Blocks.OperatorId = Users_1.UserID
+WHERE        (dbo.Blocks.deleted = 0)
+GO
+
+DROP TABLE [dbo].[tWeb_PlayOutTasks]
+GO
+
+/****** Object:  Table [dbo].[tWeb_PlayOutTasks]    Script Date: 17.12.2019 11:38:41 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tWeb_PlayOutTasks](
+	[id] [nvarchar](90) NOT NULL,
+	[serverId] [nvarchar](90) NOT NULL,
+	[dateCreate] [datetime] NOT NULL,
+	[status] [int] NOT NULL,
+	[description] [nvarchar](max) NOT NULL,
+	[newsId] [bigint] NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOutTasks] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tWeb_PlayOutTasks] ADD  CONSTRAINT [DF_tWeb_PlayOutTasks_newsId]  DEFAULT ((0)) FOR [newsId]
+GO
+
+DROP TABLE [dbo].[tWeb_PlayOutTaskFiles]
+GO
+
+
+CREATE TABLE [dbo].[tWeb_PlayOutTaskFiles](
+	[id] [nvarchar](90) NOT NULL,
+	[taskId] [nvarchar](90) NOT NULL,
+	[fileName] [nvarchar](max) NOT NULL,
+	[fileTitle] [nvarchar](max) NOT NULL,
+	[status] [int] NOT NULL,
+	[description] [int] NOT NULL,
+	[bytes] [bigint] NOT NULL,
+	[date] [datetime] NOT NULL,
+	[bytesSend] [bigint] NOT NULL,
+	[sort] [int] NOT NULL,
+	[subBlockId] [bigint] NOT NULL,
+ CONSTRAINT [PK_tWeb_PlayOutTaskFiles] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tWeb_PlayOutTaskFiles] ADD  CONSTRAINT [DF_tWeb_PlayOutTaskFiles_sort]  DEFAULT ((0)) FOR [sort]
+GO
+
+ALTER TABLE [dbo].[tWeb_PlayOutTaskFiles] ADD  CONSTRAINT [DF_tWeb_PlayOutTaskFiles_subBlockId]  DEFAULT ((0)) FOR [subBlockId]
+GO
+
+ALTER TABLE  [dbo].[Blocks] ADD isChanged DateTime
+
+GO
+
+USE [NewsFactory]
+GO
+
+/****** Object:  View [dbo].[vWeb_BlockToExtView]    Script Date: 15.02.2020 12:35:40 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+/****** Object:  View [dbo].[vWeb_BlockToExtView]    Script Date: 15.02.2020 12:36:53 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER VIEW [dbo].[vWeb_BlockToExtView]
+AS
+SELECT        dbo.Blocks.Name, dbo.Users.UserName AS Creator, Users_1.UserName AS Operator, Users_2.UserName AS Jockey, Users_3.UserName AS Cutter, dbo.Blocks.BlockText, dbo.Blocks.Description, dbo.Blocks.Ready, 
+                         dbo.Blocks.Approve, dbo.Blocks.Id, dbo.Blocks.isChanged, dbo.Blocks.ParentId, dbo.Blocks.NewsId
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.Users AS Users_3 ON dbo.Blocks.CutterId = Users_3.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_2 ON dbo.Blocks.JockeyId = Users_2.UserID LEFT OUTER JOIN
+                         dbo.Users ON dbo.Blocks.CreatorId = dbo.Users.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_1 ON dbo.Blocks.OperatorId = Users_1.UserID
+WHERE        (dbo.Blocks.deleted = 0)
+GO
+CREATE VIEW [dbo].[vWeb_blocksForPortal]
+AS
+SELECT        dbo.Blocks.Name, dbo.Users.UserName AS Creator, Users_1.UserName AS Operator, Users_2.UserName AS Jockey, Users_3.UserName AS Cutter, dbo.Blocks.BlockText, dbo.Blocks.Description, dbo.Blocks.Ready, 
+                         dbo.Blocks.Approve, dbo.Blocks.Id, dbo.Blocks.isChanged, dbo.Blocks.NewsId, dbo.Blocks.BLockType, dbo.BlockType.TypeName, dbo.Blocks.deleted, dbo.Blocks.Sort
+FROM            dbo.Blocks INNER JOIN
+                         dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id LEFT OUTER JOIN
+                         dbo.Users AS Users_3 ON dbo.Blocks.CutterId = Users_3.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_2 ON dbo.Blocks.JockeyId = Users_2.UserID LEFT OUTER JOIN
+                         dbo.Users ON dbo.Blocks.CreatorId = dbo.Users.UserID LEFT OUTER JOIN
+                         dbo.Users AS Users_1 ON dbo.Blocks.OperatorId = Users_1.UserID
+WHERE         (dbo.Blocks.ParentId = 0) AND (dbo.Blocks.isChanged IS NOT NULL)
+
+GO
+
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalUrl',
+           'http://portal.nay24.pro',
+           '')
+GO
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalGroupId',
+           '1',
+           '')
+GO
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalClientId',
+           '1',
+           '')
+GO
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalClientTitle',
+           'testStation',
+           '')
+GO
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalClientSecret',
+           'bigSecretkejbviy34',
+           '')
+GO
+INSERT INTO [dbo].[vWeb_Settings]
+           ([Key]
+           ,[value]
+           ,[Description])
+     VALUES
+           ( 'portalEnable',
+           '0',
+           '')
+GO
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNewsWITHnoSORT]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint,
+	@SortOrder int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name, @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId  and deleted=0) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId  and deleted=0
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id 
+	WHILE @@fetch_status=0
+	BEGIN
+	DECLARE @newSubblock_id bigint 
+		SELECT @newSubblock_id= convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999)
+		
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1, TextLang2, TextLang3)
+			SELECT @newSubblock_id, [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1, TextLang2, TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+		DECLARE @newMediaGrId nvarchar(90)
+			DECLARE @MediaGrId nvarchar(90)
+			SELECT   @newMediaGrId=convert(nvarchar(90), NEWID())
+			INSERT INTO [dbo].[tWeb_mediaGraphic] (id, layerId, MediaId) SELECT @newMediaGrId,[layerId],@newSubblock_id FROM [dbo].[tWeb_mediaGraphic]  WHERE [MediaId]=@Subblock_id
+			
+			INSERT INTO [dbo].[tWeb_MediaGraphicsItems] (mediaGraphicsId,timeInSec,[text])
+			(
+			SELECT @newMediaGrId, timeInSec,[text] 
+			FROM [dbo].[tWeb_MediaGraphicsItems]
+			 WHERE [mediaGraphicsId] 
+			 IN( SELECT id from [dbo].[tWeb_mediaGraphic] WHERE [MediaId]=@Subblock_id ))
+
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	exec dbo.sp_UpdateNewsHrono @NewBlockId
+END
+
+RETURN @NewBlockId
+END
+GO
+ALTER PROCEDURE [dbo].[pWeb_CopyBlockTONewNews]
+ 
+	@BlocksId bigint,
+	@NewNewsId bigint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+DECLARE @NewBlockId bigint 
+DECLARE @Subblock_id bigint 
+DECLARE @Error_Num int
+DECLARE @SortOrder int
+
+SELECT @NewBlockId=ABS(CHECKSUM(NEWID())) % 99999999999
+IF ((SELECT COUNT(id) FROM Blocks WHERE NewsId=@NewNewsId)=0)
+BEGIN
+SET @SortOrder=10
+END
+ELSE
+BEGIN
+SELECT @SortOrder=MAX(Sort)+10 FROM Blocks WHERE NewsId=@NewNewsId
+END
+
+	INSERT INTO Blocks 
+	( Id, Name, NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3)
+	SELECT (@NewBlockId), Name + ' - copy', @NewNewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, @SortOrder, Description, Ready, Approve, deleted, TextLang1, TextLang2, TextLang3
+FROM BLOCKS
+	WHERE Id=@BlocksId AND ParentId=0
+	
+	IF(SELECT count([id]) FROM Blocks WHERE ParentId=@BlocksId  and deleted=0) > 0
+BEGIN
+	DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE ParentId=@BlocksId and deleted=0
+	OPEN st1
+	FETCH NEXT FROM st1 INTO @Subblock_id
+	WHILE @@fetch_status=0
+	BEGIN
+		
+		DECLARE @newSubblock_id bigint 
+		SELECT @newSubblock_id= convert(bigint,ABS(CHECKSUM(NEWID())) % 99999999999)
+
+			INSERT INTO Blocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], 
+						Ready, Approve, TextLang1,TextLang2,TextLang3)
+			SELECT @newSubblock_id, [Name], @NewNewsId, @NewBlockId, BLockType, CreatorId, OperatorId, 
+				JockeyId, CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks WHERE [id]=@Subblock_id
+			
+			DECLARE @newMediaGrId nvarchar(90)
+			DECLARE @MediaGrId nvarchar(90)
+			SELECT   @newMediaGrId=convert(nvarchar(90), NEWID())
+			INSERT INTO [dbo].[tWeb_mediaGraphic] (id, layerId, MediaId) SELECT @newMediaGrId,[layerId],@newSubblock_id FROM [dbo].[tWeb_mediaGraphic]  WHERE [MediaId]=@Subblock_id
+			
+			INSERT INTO [dbo].[tWeb_MediaGraphicsItems] (mediaGraphicsId,timeInSec,[text])
+			(
+			SELECT @newMediaGrId, timeInSec,[text] 
+			FROM [dbo].[tWeb_MediaGraphicsItems]
+			 WHERE [mediaGraphicsId] 
+			 IN( SELECT id from [dbo].[tWeb_mediaGraphic] WHERE [MediaId]=@Subblock_id ))
+				
+		
+			
+		FETCH NEXT FROM st1 INTO @Subblock_id
+	END
+	CLOSE st1
+	DEALLOCATE st1
+	
+	EXECUTE [sp_SortBlocks] @NewnewsId
+END
+
+
+END
+
+GO
+
+CREATE FUNCTION [dbo].[fWeb_SrtStatusFromBlock]
+(
+	-- Add the parameters for the function here
+	@blockId bigint
+)
+RETURNS int
+AS
+BEGIN
+DECLARE @COUNT int
+
+select @COUNT=count(id) from [dbo].[tWeb_MediaGraphicsItems] where [mediaGraphicsId] IN (
+select ID from [dbo].[tWeb_mediaGraphic] where MediaId IN (
+select ID from Blocks where deleted=0 AND parentId=@blockId)
+)
+
+RETURN @COUNT
+
+END
+GO
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT        TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                         dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) AS TaskTime, 
+                         dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.CreatorId, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.Sort, 
+                         dbo.fWeb_GetLockUserName(dbo.Blocks.Id) AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus, dbo.Blocks.CutterId, 
+                         dbo.fWeb_SrtStatusFromBlock(dbo.Blocks.Id) AS srtStatus
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE        (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+
+GO
+ALTER TABLE [dbo].[tWeb_PlayOuts]
+ADD [SrtPrefix] [nvarchar](max) NOT NULL  DEFAULT ('')
+GO
+USE [NewsFactory]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_NewsToArchive]    Script Date: 27.02.2020 16:22:18 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+----------------------------------------------
+----------------------------------------------
+ALTER PROCEDURE [dbo].[sp_NewsToArchive] 
+@News_id  Bigint
+
+AS
+
+-- ????????? ?????? ? ????? ??????? ????????? ???? ???? ? ??????? ??????
+-- ??????? ???????? @News_id  - id ???????
+-- ?????  RETURN ??? ?????? ??? 0 ???? ??????? ??? 2 ???? 
+
+-- News_To_Archive
+
+DECLARE @rustv_err_status int
+DECLARE @err_status int
+DECLARE @Block_id bigint
+DECLARE @New_Block_id bigint
+DECLARE @New_Subblock_id bigint
+DECLARE @Subblock_id bigint
+DECLARE @newNewsId bigint
+
+DECLARE @Error_Num int
+DECLARE @Error_Count int
+
+IF ((SELECT rustv FROM programs WHERE [id] IN (SELECT programid FROM news WHERE [id]=@News_id))>0)
+EXECUTE @rustv_err_status = sp_NewsToOutbox 0, @News_id
+IF (@rustv_err_status <> 0) SET @rustv_err_status = @rustv_err_status*10
+
+BEGIN TRANSACTION NewsToArchive
+SET @newNewsId=(convert(bigint,rand()*1000000000000000))
+INSERT INTO ArcNews  ([id], [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, ProgramId, 
+			Cassete, Time_Code, Duration, Deleted)
+SELECT @newNewsId, [Name], EditorId, NewsDate, [Description], NewsTime, CalcTime, TaskTime, 
+	ProgramId, Cassete, Time_Code, Duration, Deleted
+FROM News WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+/*INSERT INTO ArchBlocks ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId,CutterId, BlockTime, 
+			TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3)
+SELECT [Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, JockeyId, CutterId, BlockTime, TaskTime, 
+	CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+FROM  Blocks WHERE NewsId=@News_id and deleted=0*/
+----------------------------------
+
+INSERT INTO dbo.tWeb_ArchiveBlockHistory
+SELECT * FROM  dbo.tWeb_BlockHistory
+WHERE blockId in (SELECT id FROM Blocks WHERE NewsId=@News_id and deleted=0)
+                 
+DELETE FROM   tWeb_BlockHistory 
+WHERE blockId in (SELECT id FROM Blocks WHERE NewsId=@News_id and deleted=0)
+      
+	  DECLARE st cursor FOR SELECT [id] FROM Blocks where newsid = @News_id  AND ParentId=0 AND deleted=0
+OPEN st
+FETCH NEXT FROM st INTO @Block_id
+WHILE @@fetch_status=0
+BEGIN
+
+	SET @Error_Num=2627
+	SET @Error_Count=0
+	WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+		BEGIN
+			SET @Error_Count=@Error_Count+1
+			SET @New_Block_id=(convert(bigint,rand()*1000000000000000))
+     			INSERT INTO ArchBlocks  ([Id], [Name], NewsId, ParentId, BLockType, CreatorId, OperatorId, 
+						JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready,  Approve, TextLang1,TextLang2,TextLang3)
+			SELECT @New_Block_id, [Name],@newNewsId, ParentId, BLockType, CreatorId, OperatorId, 
+				JockeyId,CutterId, BlockTime, TaskTime, CalcTime, BlockText, Sort, [Description], Ready, Approve, TextLang1,TextLang2,TextLang3
+			FROM  Blocks where id=@Block_id
+			SET @Error_Num=@@ERROR
+		END
+		IF  @Error_Num <> 0 
+		BEGIN
+			CLOSE st
+			DEALLOCATE st			
+			ROLLBACK TRANSACTION NewsToCopyNews
+			RETURN 1
+		END
+-- ???? ?? ??????? ???? ??????????? ?????? ?????
+	IF(SELECT count([id]) FROM blocks WHERE ParentId=@Block_id) > 0
+	BEGIN
+		DECLARE st1 cursor FOR SELECT [id] FROM Blocks WHERE  ParentId=@Block_id
+		OPEN st1
+		FETCH NEXT FROM st1 INTO @Subblock_id
+		WHILE @@fetch_status=0
+    		BEGIN
+
+			SET @Error_Num=2627
+			SET @Error_Count=0
+			WHILE (@Error_Num=2627) AND (@Error_Count <10) 
+				BEGIN
+					SET @Error_Count=@Error_Count+1
+					SET @New_Subblock_id= (convert(bigint,rand()*1000000000000000))
+					INSERT INTO ArchBlocks ([Id], [Name], ParentId, NewsId, BLockType, CreatorId, 
+								OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+								BlockText, Sort, [Description], Ready, Approve)
+					SELECT @New_Subblock_id, [Name], @New_Block_id, @newNewsId, BLockType, 
+						CreatorId, OperatorId, JockeyId, BlockTime, TaskTime, CalcTime, 
+						BlockText, Sort, [Description], Ready, Approve
+					FROM  Blocks WHERE [id]=@Subblock_id
+					SET @Error_Num=@@ERROR
+				END
+			IF  @Error_Num <> 0 
+				BEGIN
+					CLOSE st
+
+					DEALLOCATE st
+
+					CLOSE st1
+
+					DEALLOCATE st1
+
+					ROLLBACK TRANSACTION NewsToCopyNews
+					RETURN 1
+				END
+			FETCH NEXT FROM st1 INTO @Subblock_id
+		END
+		CLOSE st1
+		DEALLOCATE st1
+	END
+	FETCH NEXT FROM st INTO @Block_id
+END                 
+CLOSE st
+DEALLOCATE st     
+
+ UPDATE News Set Deleted=1 WHERE [id]=@News_id   
+---------------------------------
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+
+
+/*
+DECLARE @Block_id BIGINT
+DECLARE stArchive CURSOR FOR SELECT [id] FROM Blocks WHERE ParentId IN (SELECT [Id] FROM  Blocks WHERE NewsId=@News_id and deleted=0)
+OPEN stArchive
+FETCH NEXT FROM stArchive INTO @Block_id
+WHILE @@fetch_status=0
+	BEGIN
+	DECLARE @ProgramID INT
+	DECLARE @AProgramId INT
+	DECLARE @APlaceId INT
+	SELECT id, Name, ParentId FROM Blocks WHERE ID=@Block_id
+	SELECT     @ProgramID=Programs.id  FROM         Blocks INNER JOIN 		                      News ON Blocks.NewsId = News.id INNER JOIN		                      Programs ON News.ProgramId = Programs.id		WHERE     (Blocks.Id = @Block_id)
+	SELECT     @APlaceId=ID FROM     NewsFactoryArchive.dbo.tPlace WHERE     (Name = (SELECT name FROM Blocks WHERE ID=@Block_id)) ORDER BY InsertDate DESC
+	SELECT     @AProgramId=ID FROM         NewsFactoryArchive.dbo.tProgram WHERE     (Deleted = 0) AND (FactoryId = @ProgramID)
+	IF ((@APlaceId IS NOT NULL) AND (@AProgramId IS NOT NULL))
+	BEGIN
+		DECLARE @AMaterialId BIGINT
+		DECLARE @Blocktext nvarchar(4000)
+		SELECT @Blocktext=convert(nvarchar(4000),BlockText) FROM BLOCKS WHERE ID=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		INSERT INTO NewsFactoryArchive.dbo.tMaterial (ProgramID, Description, Title ) SELECT @AProgramId ,@BlockText, Name   FROM BLOCKS WHERE ID=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		SELECT @AMaterialId=MAX(ID) FROM NewsFactoryArchive.dbo.tMaterial
+		UPDATE NewsFactoryArchive.dbo.tMaterial SET MaterialGroupID =(SELECT min(ID) FROM  NewsFactoryArchive.dbo.tMaterialGroup), MaterialTypeID=(SELECT min(ID) FROM  NewsFactoryArchive.dbo.tMaterialType) WHERE id=@AMaterialId
+		
+		
+		UPDATE NewsFactoryArchive.dbo.tMaterial SET BroadcastDate=(SELECT     2+convert(int, News.NewsDate)  FROM         Blocks INNER JOIN                       News ON Blocks.NewsId = News.id  WHERE     (Blocks.Id = (SELECT ParentId FROM BLOCKS WHERE ID=@Block_id))) WHERE id=@AMaterialId
+		
+
+
+		DECLARE @buf nvarchar(255)
+		SELECT     @buf=Users.UserName FROM         Blocks INNER JOIN  Users ON Blocks.CreatorId = Users.UserID WHERE Blocks.Id=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		
+		IF (@buf IS NOT NULL ) 
+		BEGIN
+			UPDATE NewsFactoryArchive.dbo.tMaterial SET Autor =@buf WHERE id=@AMaterialId
+		END		
+		SET @buf=NULL
+		SELECT     @buf=Users.UserName FROM         Blocks INNER JOIN  Users ON Blocks.OperatorId = Users.UserID WHERE Blocks.Id=(SELECT ParentId FROM BLOCKS WHERE ID=@Block_id)
+		IF( @buf IS NOT NULL ) 
+		BEGIN
+			UPDATE NewsFactoryArchive.dbo.tMaterial SET Cammen =@buf WHERE id=@AMaterialId
+		END
+		INSERT INTO NewsFactoryArchive.dbo.tMaterialToPlace(MaterialID, PlaceID, Timecode, FileName, Comments )
+		SELECT   @AMaterialId, @APlaceId,  BlockTime+570 ,convert(nvarchar(1024), BlockText), convert(nvarchar(255), Description ) FROM         Blocks WHERE     (ID=@Block_id)
+	END
+	FETCH NEXT FROM stArchive INTO @Block_id
+END
+CLOSE stArchive
+DEALLOCATE stArchive	
+
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+DELETE FROM blocks WHERE NewsId=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+*/
+DELETE FROM news WHERE [id]=@News_id
+SET @err_status = @@ERROR
+IF (@err_status <> 0)
+BEGIN
+	ROLLBACK TRANSACTION NewsToArchive
+	RETURN @rustv_err_status+1
+END
+
+COMMIT TRANSACTION NewsToArchive
+
+
+RETURN @rustv_err_status
+
+GO
+
+CREATE VIEW [dbo].[vWeb_DeletedBlocksWithSort]
+AS
+SELECT        dbo.Users.UserName, dbo.[log].EventDate, dbo.Blocks.Id, dbo.Blocks.Name AS blockName, dbo.News.Name AS newsName, dbo.News.NewsDate
+FROM            dbo.[log] INNER JOIN
+                         dbo.Users ON dbo.[log].Userid = dbo.Users.UserID INNER JOIN
+                         dbo.Blocks ON dbo.[log].ItemID = dbo.Blocks.Id INNER JOIN
+                         dbo.News ON dbo.Blocks.NewsId = dbo.News.id
+WHERE        (dbo.Blocks.deleted = 1)
+GO
+
+
+
+ALTER TABLE [dbo].[Blocks]
+ADD  isDisable bit NOT NULL DEFAULT 0
+GO
+
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT        TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                         dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) AS TaskTime, 
+                         dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.Sort, dbo.fWeb_GetLockUserName(dbo.Blocks.Id) 
+                         AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus, dbo.Blocks.CutterId, dbo.fWeb_SrtStatusFromBlock(dbo.Blocks.Id) AS srtStatus, 
+                         dbo.Blocks.CreatorId, dbo.Users.UserName, dbo.Blocks.isDisable
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.Users ON dbo.Blocks.CreatorId = dbo.Users.UserID LEFT OUTER JOIN
+                         dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE        (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+GO
+
+CREATE TABLE [dbo].[t_BlockEditGeo](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[name] [nvarchar](255) NOT NULL,
+	[description] [nvarchar](255) NOT NULL,
+ CONSTRAINT [PK_BlockEditGeo] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[t_BlockEditGeo] ADD  CONSTRAINT [DF_BlockEditGeo_name]  DEFAULT (' ') FOR [name]
+GO
+
+ALTER TABLE [dbo].[t_BlockEditGeo] ADD  CONSTRAINT [DF_BlockEditGeo_description]  DEFAULT (' ') FOR [description]
+GO
+
+CREATE TABLE [dbo].[t_BlockEditSrc](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[name] [nvarchar](255) NOT NULL,
+	[description] [nvarchar](255) NOT NULL,
+ CONSTRAINT [PK_BlockEditSrc] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[t_BlockEditSrc] ADD  CONSTRAINT [DF_BlockEditSrc_name]  DEFAULT (' ') FOR [name]
+GO
+
+ALTER TABLE [dbo].[t_BlockEditSrc] ADD  CONSTRAINT [DF_BlockEditSrc_description]  DEFAULT (' ') FOR [description]
+GO
+
+ALTER VIEW [dbo].[vWeb_Blocks]
+AS
+SELECT        TOP (100) PERCENT dbo.Blocks.Id, dbo.Blocks.Name, dbo.GetTypeName(dbo.BlockType.id) AS TypeName, 
+                         dbo.ConvertIntToCharTime(CASE WHEN dbo.Blocks.BlockTime > 0 THEN dbo.Blocks.BlockTime ELSE dbo.Blocks.CalcTime END) AS BlockTime, dbo.ConvertIntToCharTime(dbo.Blocks.TaskTime) AS TaskTime, 
+                         dbo.ConvertIntToCharTime(dbo.Blocks.CalcTime) AS CalcTime, dbo.Blocks.NewsId, dbo.Blocks.ParentId, dbo.Blocks.Ready, dbo.Blocks.Approve, dbo.Blocks.Sort, dbo.fWeb_GetLockUserName(dbo.Blocks.Id) 
+                         AS LookedUserName, dbo.Blocks.TextLang3 AS BgColorIndex, dbo.fWeb_MediaStatusFromBlock(dbo.Blocks.Id) AS mediaSatus, dbo.Blocks.CutterId, dbo.fWeb_SrtStatusFromBlock(dbo.Blocks.Id) AS srtStatus, 
+                         dbo.Blocks.CreatorId, dbo.Users.UserName, dbo.Blocks.isDisable, dbo.Blocks.BlockText
+FROM            dbo.Blocks LEFT OUTER JOIN
+                         dbo.Users ON dbo.Blocks.CreatorId = dbo.Users.UserID LEFT OUTER JOIN
+                         dbo.BlockType ON dbo.Blocks.BLockType = dbo.BlockType.id
+WHERE        (dbo.Blocks.deleted = 0)
+ORDER BY dbo.Blocks.Sort
+GO
+CREATE VIEW [dbo].[vWeb_mobileView]
+AS
+SELECT        TOP (50) m.id, m.insertDate, m.message
+FROM            dbo.tSocial_feedToMessage AS m INNER JOIN
+                         dbo.tSocial_Feed AS f ON m.feedId = f.id
+WHERE        (f.typeId = 7) AND (f.deleted = 0)
+ORDER BY m.insertDate DESC
+
+GO
+
+CREATE TRIGGER [dbo].[publish_mobile]
+ON [dbo].[tSocial_feedToMessage] 
+AFTER INSERT   
+AS 
+	declare @feedTypeId int
+	select @feedTypeId=typeid from [dbo].[tSocial_Feed] where id=(select [feedId] from inserted)
+	if(@feedTypeId=7)
+	BEGIN
+		UPDATE [dbo].[tSocial_feedToMessage] SET [status]=2 WHERE ID=(SELECT ID from inserted)
+	END
+GO
+
+USE [NewsFactory]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Message]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Feed]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [DF_tSocial_feedToMessage_imgFile]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [DF_tSocial_feedToMessage_socialError]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [DF_tSocial_feedToMessage_socialId]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] DROP CONSTRAINT [DF_tSocial_feedToMessage_publishCount]
+GO
+
+/****** Object:  Table [dbo].[tSocial_feedToMessage]    Script Date: 18.01.2022 1:19:33 ******/
+DROP TABLE [dbo].[tSocial_feedToMessage]
+GO
+
+/****** Object:  Table [dbo].[tSocial_feedToMessage]    Script Date: 18.01.2022 1:19:33 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tSocial_feedToMessage](
+	[id] [nvarchar](90) NOT NULL,
+	[feedId] [nvarchar](90) NOT NULL,
+	[socialMessId] [nvarchar](90) NOT NULL,
+	[insertDate] [datetime] NOT NULL,
+	[updateStatusDate] [datetime] NOT NULL,
+	[status] [int] NOT NULL,
+	[message] [ntext] NOT NULL,
+	[publishCount] [int] NOT NULL,
+	[socialId] [nvarchar](max) NOT NULL,
+	[socialError] [nvarchar](max) NOT NULL,
+	[imgFile] [nvarchar](max) NOT NULL,
+ CONSTRAINT [PK_tSocial_feedToMessage] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_publishCount]  DEFAULT ((0)) FOR [publishCount]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_socialId]  DEFAULT ('') FOR [socialId]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_socialError]  DEFAULT ('') FOR [socialError]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] ADD  CONSTRAINT [DF_tSocial_feedToMessage_imgFile]  DEFAULT ('') FOR [imgFile]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage]  WITH CHECK ADD  CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Feed] FOREIGN KEY([feedId])
+REFERENCES [dbo].[tSocial_Feed] ([id])
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] CHECK CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Feed]
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage]  WITH CHECK ADD  CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Message] FOREIGN KEY([socialMessId])
+REFERENCES [dbo].[tSocial_Message] ([id])
+GO
+
+ALTER TABLE [dbo].[tSocial_feedToMessage] CHECK CONSTRAINT [FK_tSocial_feedToMessage_tSocial_Message]
+GO
+ALTER VIEW [dbo].[vWeb_mobileView]
+AS
+SELECT        TOP (50) m.id, m.insertDate, m.message, m.imgFile
+FROM            dbo.tSocial_feedToMessage AS m INNER JOIN
+                         dbo.tSocial_Feed AS f ON m.feedId = f.id
+WHERE        (f.typeId = 7) AND (f.deleted = 0)
+ORDER BY m.insertDate DESC
+GO

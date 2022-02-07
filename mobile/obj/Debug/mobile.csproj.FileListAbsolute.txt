@@ -1,0 +1,9 @@
+C:\projects\NewsFactoryMay24\mobile\bin\mobile.dll.config
+C:\projects\NewsFactoryMay24\mobile\bin\mobile.dll
+C:\projects\NewsFactoryMay24\mobile\bin\mobile.pdb
+C:\projects\NewsFactoryMay24\mobile\bin\Newtonsoft.Json.dll
+C:\projects\NewsFactoryMay24\mobile\obj\Debug\mobile.csprojAssemblyReference.cache
+C:\projects\NewsFactoryMay24\mobile\obj\Debug\mobile.csproj.CoreCompileInputs.cache
+C:\projects\NewsFactoryMay24\mobile\obj\Debug\mobile.csproj.CopyComplete
+C:\projects\NewsFactoryMay24\mobile\obj\Debug\mobile.dll
+C:\projects\NewsFactoryMay24\mobile\obj\Debug\mobile.pdb

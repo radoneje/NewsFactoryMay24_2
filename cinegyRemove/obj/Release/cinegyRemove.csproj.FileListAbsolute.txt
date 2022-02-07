@@ -1,0 +1,7 @@
+C:\projects\NewsFactoryMay24\cinegyRemove\obj\Release\cinegyRemove.csprojAssemblyReference.cache
+C:\projects\NewsFactoryMay24\cinegyRemove\obj\Release\cinegyRemove.csproj.CoreCompileInputs.cache
+C:\projects\NewsFactoryMay24\cinegyRemove\bin\Release\cinegyRemove.exe.config
+C:\projects\NewsFactoryMay24\cinegyRemove\bin\Release\cinegyRemove.exe
+C:\projects\NewsFactoryMay24\cinegyRemove\bin\Release\cinegyRemove.pdb
+C:\projects\NewsFactoryMay24\cinegyRemove\obj\Release\cinegyRemove.exe
+C:\projects\NewsFactoryMay24\cinegyRemove\obj\Release\cinegyRemove.pdb

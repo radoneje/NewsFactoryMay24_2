@@ -1,0 +1,49 @@
+﻿@model NFCrowlString.Models.Ctimer
+
+
+
+ <div class="timerItem" id="@Model.id">
+     @using (Ajax.BeginForm("timerItemChange", new AjaxOptions(){HttpMethod = "Post", UpdateTargetId="timerItemWr_"+Model.id})) 
+     { 
+        <input type="hidden" name="id" value="@Model.id" />
+     <div class="timerItemSect">
+         <div class="timerItemSectHead">время начала</div>
+         <div>
+             @Html.TextBoxFor(model => model._start, new { onchange="$(this).closest('form').submit()"})
+         </div>
+         <div class="timerItemSectErr">@Html.ValidationMessageFor(model => model._start)</div>
+     </div> 
+     <div class="timerItemSect">
+         <div class="timerItemSectHead">&nbsp;</div>
+         <div>
+              @Html.CheckBoxFor(model => model._isEnd, new { @class = "timerItemIsEnd", onchange = "timerItemIsEnd(this);$(this).closest('form').submit()", onload = "timerItemIsEnd(this)" })
+         </div>
+         <div class="timerItemSectErr">@Html.ValidationMessageFor(model => model._isEnd)</div>
+     </div>   
+     <div class="timerItemSect" >
+         <div class="timerItemSectHead">время окончания</div>
+         <div>
+             @Html.TextBoxFor(model => model._end, new { @class = "timerItemEndDate", onchange = "$(this).closest('form').submit()" })
+         </div>
+         <div class="timerItemSectErr">@Html.ValidationMessageFor(model => model._end)</div>
+     </div> 
+     <div class="timerItemSect">
+         <div class="timerItemSectHead">&nbsp;</div>
+         <div>
+           @Html.LabelFor(model => model._daily)  @Html.CheckBoxFor(model => model._daily, new { onchange = "$(this).closest('form').submit()" })
+         </div>
+         <div class="timerItemSectErr">@Html.ValidationMessageFor(model => model._daily)</div>
+     </div>
+     <div class="timerItemSect">
+         <div class="timerItemSectHead">&nbsp;</div>
+         <div class="timerItemSectDeleteBtn" onclick="timerItemSectDelete(this)">
+         </div>
+         </div>
+     <div style="clear:both"></div>
+     }
+     </div>
+<script>
+    timerItemIsEnd($("#@Model.id").find(".timerItemIsEnd"));
+</script>
+  
+

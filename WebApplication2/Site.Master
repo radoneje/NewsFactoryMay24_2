@@ -1,0 +1,160 @@
+﻿<%@ Master Language="C#"  AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="WebApplication2.SiteMaster" %>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+
+    <title>May24 NewsRoom</title>
+    <script>
+        const serverRoot='<%=(string)Application["serverRoot"] %>';
+    </script>
+    <link href="<%=(string)Application["serverRoot"] %>favicon.ico" rel="shortcut icon" type="image/x-icon" />  
+    <link href="<%=(string)Application["serverRoot"] %>bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+     <link href="<%=(string)Application["serverRoot"] %>Styles/slick.css" rel="stylesheet" />
+     <link href="<%=(string)Application["serverRoot"] %>Styles/slick-theme.css" rel="stylesheet" />
+
+
+    <link href="<%=(string)Application["serverRoot"] %>Styles/NFW.css?date=25122119_1" rel="stylesheet" />
+    <link href="<%=(string)Application["serverRoot"] %>Styles/1024style.css?date=12032918" rel="stylesheet" />
+    <link href="<%=(string)Application["serverRoot"] %>Styles/1260style.css?date=12032918" rel="stylesheet" />
+    <link href="<%=(string)Application["serverRoot"] %>Styles/960style.css?date=12032918" rel="stylesheet" />
+    <link href="<%=(string)Application["serverRoot"] %>Styles/560style.css?date=12032918" rel="stylesheet" />
+    <link href="<%=(string)Application["serverRoot"] %>Styles/custom.css?date=25042018_6" rel="stylesheet" />
+  
+  
+    <script src="<%=(string)Application["serverRoot"] %>Scripts/jquery-2.1.3.min.js"></script>
+    <script src="<%=(string)Application["serverRoot"] %>Scripts/jquery-ui-1.12.1.js"></script>
+     <script src="<%=(string)Application["serverRoot"] %>bootstrap/bootstrap-3.3.2-dist/js/bootstrap.js"></script>
+    <script src="<%=(string)Application["serverRoot"] %>Scripts/slick.min.js"></script>
+    <script src="<%=(string)Application["serverRoot"] %>Scripts/moment.min.js"></script>
+    <script src="<%=(string)Application["serverRoot"] %>Scripts/Utils.js"></script>
+    <script src="<%=(string)Application["serverRoot"] %>Resources/lang0.js"></script>
+      
+   
+  
+
+
+    <meta name="viewport" content="width=device-width" />
+    <asp:PlaceHolder runat="server"></asp:PlaceHolder>
+    <asp:ContentPlaceHolder runat="server" ID="HeadContent" Visible="false" />
+    <DIV id="headMasterHeadDiv" runat="server"></DIV>
+     
+</head>
+<body draggable='false'>
+    <form runat="server" onsubmit="PageOnSubmit();return false;" id="MainForm" >
+        <div>
+            <div class="panel panel-default" style="clear: both; margin: 5px; padding: 0 10px;position:relative">
+                <div style="float: left">
+                    <img src="<%=(string)Application["serverRoot"] %>Images/may24Logo.svg" style="height: 3em; width: auto;opacity: .5;margin-left: -10px; padding: 4px 0;">
+                </div>
+                 <div style="" class="masterHeadContent">
+                        <asp:ContentPlaceHolder runat="server" ID="headMenu" />
+                 </div>
+                <div style="float: right">
+                    <script>
+                        var langId = localStorage.getItem("languageId");
+                        if (langId == null) {
+                            langId = 0;
+                            localStorage.setItem("languageId", langId);
+                        }
+
+                    </script>
+                    <select id="LangSelect" onchange="ChangeLang($(this).find('option:selected').val());" style="">
+                        <option value="0">rus</option>
+                        <option value="1">eng</option>
+                        <option value="2">az</option>
+                        <option value="3">ua</option>
+                        <option value="4">am</option>
+                        <option value="5">it</option>
+                        <option value="6">fr</option>
+                        <option value="7">pt</option>
+                    </select>
+                     <button type="button" id="exitBtn" class="headBtn btn btn-default btn-xs" aria-label="Left Align" style="display:none;" onclick="exitUser(event);">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true">&nbsp;exit</span>
+                    </button>
+                    <button type="button" class="headBtn btn btn-default btn-xs" aria-label="Left Align" style="" onclick="if($('#LangSelect').find('option:selected').val()==1) document.location.href='/Content/manual_eng.pdf'; else document.location.href='/Content/manual_rus.pdf'">
+                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true">&nbsp;help</span>
+                    </button>
+                    
+                    <div style="clear: both"></div>
+                    <script>
+                        ChangeLang(langId);
+                    </script>
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <div id="GlobalAlert" class="AlwaysOnTop alert alert-success" role="alert" style="display: none"></div>
+        </div>
+        <asp:Panel ID="panelDemoExired" runat="server" Visible="false">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="alert alert-danger">
+                        <h4>Истек срок демонстрационной версии</h4>
+                        <h4>Demo time is over</h4>
+                    </div>
+                </div>
+            </div>
+        </asp:Panel> 
+         <asp:Panel ID="panelLogin" runat="server">
+             <script src="<%=(string)Application["serverRoot"] %>Scripts/LoginScript.js"></script>
+
+
+<div class="loginWr">
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <h4>
+                <span id="LoginMessagePanel" class="caption caption-html" captionid="loginMessage"></span>
+                <script>
+                    $("#LoginMessagePanel").html(langTable['loginMessage'])
+                </script>
+            </h4>
+        </div>
+        <div class="panel panel-body">
+            <div class="form-horizontal loginform">
+                <asp:Panel ID="incorrectPanel" runat="server" Visible="false">
+                    <div id="loginError" class="loginError caption caption-html" captionid="PassIsNotCorrect">
+                    </div>
+                          <script>
+                              $("#loginError").html(langTable['PassIsNotCorrect']);
+                        </script>
+                </asp:Panel>
+                 <asp:Panel ID="loginErrorMaxConnectPanel" runat="server" Visible="false">
+                    <div id="loginErrorMaxConnect" class="loginError caption caption-html" captionid="loginErrorMaxConnect">
+                    </div>
+                          <script>
+                              $("#loginErrorMaxConnect").html(langTable['loginErrorMaxConnect']);
+                        </script>
+                </asp:Panel>
+               <!-- <asp:DropDownList ID="fLogin" runat="server" class="fLogin fullCtrl form-control" ViewStateMode="Enabled" ClientIDMode="Static" >
+                    
+                </asp:DropDownList>-->
+                <select ID="htmlLogin" class="fLogin fullCtrl form-control" onchange="selectLoginChange(this);">
+                    <option Selected Value="-1" id="tmpOptionLogin">
+                      ...
+                    </option>
+                </select>
+                <asp:TextBox ID="fPassword" MaxLength="90" runat="server" placeholder="Пароль" TextMode="Password" class="fullCtrl form-control caption caption-placeholder " captionId="fPassword" ClientIDMode="Static"></asp:TextBox>
+                <script>$('#fPassword').attr('placeholder', langTable['fPassword'])</script>
+                <asp:Button ID="LoginBtn1" runat="server" Text="Войти" CssClass="fullCtrl btn btn-default btn-success caption caption-value" captionId="LoginBtn" ClientIDMode="Static"  OnClientClick="" OnClick="LoginBtn1_Click"  />
+                <script>$('#LoginBtn').val(langTable['LoginBtn']); $("#fPassword").focus();</script>
+                <input type="hidden" runat="server" id="hiddenLogin" ClientIDMode="Static" />
+            </div>
+        </div>
+    </div>
+
+</div>
+        </asp:Panel>
+        <asp:Panel ID="panelWork" runat="server" Visible="false">
+            <asp:ContentPlaceHolder runat="server" ID="FeaturedContent" />
+            <asp:ContentPlaceHolder runat="server" ID="MainContent" />
+        </asp:Panel>
+
+        <footer>
+        </footer>
+    </form>
+</body>
+</html>

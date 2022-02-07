@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>May24 Prompter</title>
+    <link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/promptStyle.css">
+</head>
+<body>
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+    <div class="alert alert-warning"><a id="linkToShow" href="" target="_blank"> Ссылка на показ суфлера </a></div>
+    <div class="Wr" id="app">
+
+        <div class="pBlock"><div class="vCtrlWr"><div class="vCtrlItems" style="max-height:calc(100vh - 80px); overflow-y:scroll"><div class="vCtrlItem" v-for="block in blocks" :id="'listblock'+block.Id" v-bind:class="{disabled:!block.enabled}"><label><span>{{block.TypeName}} {{block.Name}} &nbsp;</span><input type="checkbox" v-model="block.enabled" v-if="!isRunning"></label><div style="display: flex;justify-content: space-between;"><div><!--.vBlockTitle--><div class="vBlockText" v-html="html(block.BlockText)"></div></div><div class="btn btn-default" v-if="isRunning &amp;&amp; block.enabled" v-on:click="scrollToBlock(block.Id)">^</div></div></div></div></div><div><div class="btn btn-default" v-on:click="updateBlocks()" v-if="!isRunning">Update</div></div></div><div class="pBlock">
+            <div></div><div class="pBody">
+                <div class="pBodyWr" id="pBodyWr">
+                    <div id="pPrompt">
+                        <div class="itemsWr">
+                            <div class="items">
+                                <div class="item" style="text-align: center;margin-bottom:20px">
+                                    <svg style="width:2em" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 330 330" xml:space="preserve">
+<path fill="#ff00ff" id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
+</svg>
+                                </div><div class="item" v-for="block in promptBlocks" :id="'block'+block.Id"><div class="pitemTitle">{{block.TypeName}} {{block.Name}}</div><div class="pitemText" v-html="html(block.BlockText)"></div></div><div class="item" style="text-align: center;margin-bottom:20px">
+                                    <svg style="width:2em;transform: rotate(180deg);" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 330 330" xml:space="preserve">
+<path fill="#ff00ff" id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
+</svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><div class="pSpeedCtrl" id="pSpeedCtrl"><div id="pSpeedCtrlPoint"></div></div><div class="pSpeedCtrlVal" v-bind:class="{flicker:delta<=0}" style="margin: 5px 0; padding: 10px;">speed:{{delta}}<span v-if="!isRunning">&nbsp;&nbsp;font size:&nbsp;<input id="pFontSize" type="numberic" v-model="config.fontSize" v-on:change="fontSizeChange()"><span>&nbsp;&nbsp;mirror:&nbsp;<label> &nbsp;<input type="checkbox" v-model="config.mirror" v-on:change="mirrorChange()"></label></span></span></div><div v-if="isRunning"><div><div class="btn btn-default" v-on:click="slow()">Slower</div><div class="btn btn-default" v-on:click="Reverse()">Reverse</div><div class="btn btn-default" v-on:click="fast()">Faster</div></div><div><div class="btn btn-default" style="width:100%; margin-top:20px" v-bind:class="{flicker:isPause}" v-on:click="pause()">Pause</div></div></div><div v-if="!isRunning"><div class="btn btn-default" v-on:click="start()">Start</div></div><div v-else=""><div><div class="btn btn-default" v-on:click="stop()">Stop</div></div></div>
+        </div>
+    </div>
+    <script src="/scripts/vue.min.js"></script>
+    <script src="/scripts/axios.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const newsid = urlParams.get('newsid');
+        document.getElementById("linkToShow").href="/news/promptershow.html?newsid="+newsid
+        var app = new Vue({
+            el: "#app",
+            data: {
+                isRunning: false,
+                isPause: false,
+                delta: localStorage.getItem("delta") || 5,
+                blocks: [],
+                blocksType:[],
+                promptBlocks: [],
+                config: {
+                    fontSize: localStorage.getItem("pfontSize") || 72,
+                    mirror: localStorage.getItem("pmirror") || false,
+                }
+            },
+
+            methods: {
+                html: function (txt) {
+                    txt = txt.replace(/\(\(SOT[^\)\)]+\)\)/g, "\r\n<span style='color:green; font-weight:bold'>SOT</span>\r\n")
+                    txt = txt.replace(/\(\([^\)\)]+\)\)/g, "")
+
+                    txt = txt.replace(/^[\r\n]{0,100}/, "");
+                    txt = txt.replace(/[\r\n]{2,100}/g, "</br></br>");
+
+                    txt = txt.replace(/\n/g, "</br>");
+                    return txt;
+                },
+                scrollToBlock: function (id) {
+
+                    var elem = document.getElementById("block" + id)
+
+                    i = -elem.offsetTop;
+                    this.isPause = true;
+                },
+                checkRunning: function () { return !this.isRunning },
+                Reverse: function () { this.delta = -this.delta; },
+                fast: function () {
+                    this.delta = parseInt(this.delta) + 20;
+                    if (parseInt(this.delta) > 400 || parseInt(this.delta) < -400)
+                        this.delta = 400;
+
+
+                },
+                slow: function () {
+                    this.delta = parseInt(this.delta) - 20;
+                    if (parseInt(this.delta) > 400 || parseInt(this.delta) < -400)
+                        this.delta = -400;
+
+                },
+                fontSizeChange: function () {
+                    document.getElementById("pPrompt").style.fontSize = this.config.fontSize + "px";
+                    localStorage.setItem("pfontSize", this.config.fontSize)
+                },
+                mirrorChange: function () {
+
+                    localStorage.setItem("pmirror", this.config.mirror)
+                },
+                pause: function () { this.isPause = !this.isPause },
+                start: function () {
+                    this.promptBlocks = this.blocks.filter(b => {
+                        return b.enabled;
+                    });
+                    wsSend1(JSON.stringify(this.promptBlocks));
+                    wsSend(JSON.stringify({ sender: "controller", cmd: "startPrompt", newsid, config: this.config }));
+                    i = 0;
+                    this.isRunning = true;
+                    this.isPause = true;
+                },
+                stop: function () {
+
+                    console.log("stop function")
+                    this.isPause = false;
+
+                    if (this.delta < 0)
+                        this.delta = -this.delta;
+                    this.isRunning = false;
+                    i = 0;
+                    wsSend(JSON.stringify({ sender: "controller", cmd: "stopPrompt", newsid, config: this.config, val: [] }));
+                },
+                updateBlocks: async function () {
+
+                   
+                    this.blocksType = (await axios.get("/api/blockstypejson/1/")).data;
+                    console.log(this.blocksType);
+                    var r = await axios.get("/api/blocksjson/" + newsid)
+
+                    while (r.data.length > 0) {
+                        var item = r.data.shift();
+                        var find = false;
+                        this.blocks.forEach(b => {
+                            if (b.Id == item.Id) {
+                                find = true;
+                                b.Name = item.Name;
+                                b.TypeName = item.TypeName;
+                                b.BlockText = item.BlockText;
+                            }
+                        })
+                        if (!find) {
+                            var enabled = true;
+                            this.blocksType.filter(bt => { return  bt.TypeName == item.TypeName }).forEach(bt => {
+                                console.log(" bt.Jockey", bt.Jockey)
+                                enabled = bt.Jockey;
+                            })
+
+                            item.enabled = enabled;
+                            this.blocks.push(item);
+                        }
+                    }
+                    console.log(this.blocks)
+                },
+                resize: function () {
+                    let elemPrompt = document.getElementById("pPrompt")
+                    let elemPromptWr = document.getElementById("pBodyWr")
+                    var coof = elemPromptWr.clientWidth / 1920;
+                    elemPrompt.style.transform = "scale(" + (elemPromptWr.clientWidth / 1920) + ")"
+                }
+            },
+            watch: {
+                delta: function () {
+                    localStorage.setItem("delta", this.delta);
+                    updateSpeed();
+                },
+                isRunning: function () {
+
+                },
+                promptBlocks: function () {
+                    let options = {
+                        root: document.getElementById("app"),
+                        rootMargin: '0px',
+                        threshold: 0.001
+                    }
+                    let observer = new IntersectionObserver((e) => {
+                        var elem = document.getElementById("list" + e[0].target.id)
+                        if (elem) {
+                            if (e[0].isIntersecting) {
+                                elem.classList.add("active");
+                                elem.parentNode.scrollTop = elem.offsetTop - 100;
+                            }
+                            else
+                                elem.classList.remove("active")
+                        }
+                    }, options)
+                    setTimeout(() => {
+                        this.promptBlocks.forEach(b => {
+                            observer.observe(document.getElementById("block" + b.Id))
+                        })
+                    }, 0)
+
+
+
+                }
+            },
+            mounted: async function () {
+                this.updateBlocks();
+                this.fontSizeChange();
+                setTimeout(() => {
+                    updateSpeed();
+                    if (this.config.mirror == "false")
+                        this.config.mirror = false;
+                }, 0);
+                document.body.addEventListener("keydown", (e) => {
+                    if (e.code == "Space" || e.code == "Enter") {
+                        e.preventDefault();
+                        if (!this.isRunning)
+                            this.start();
+                        else
+                            this.pause();
+                        return false;
+                    }
+                    if (e.code == "ArrowLeft") {
+                        e.preventDefault();
+                        if (this.isRunning)
+                            this.slow();
+                        return false;
+                    }
+                    if (e.code == "ArrowRight") {
+                        e.preventDefault();
+                        if (this.isRunning)
+                            this.fast();
+                        return false;
+                    }
+                    if (e.code == "Escape") {
+                        e.preventDefault();
+                        this.stop();
+                        return false;
+                    }
+
+
+
+                });
+                this.resize();
+                window.addEventListener('resize', () => {
+                    this.resize();
+                }, true);
+
+            },
+        });
+
+
+
+        var wsConnection;
+        initWs();
+        function initWs() {
+            wsConnection = new WebSocket("ws://" + document.location.host + "/ws.ashx");
+            wsConnection.onopen = function () {
+                console.log("Web socket connection esteblished");
+                wsConnection.send("Привет");
+            };
+
+            wsConnection.onclose = function (event) {
+                if (event.wasClean) {
+                    console.warn('Web socket connection CLOSED partly');
+                } else {
+                    console.warn('Web socket connection is list'); // например, "убит" процесс сервера
+                }
+                console.log('Code: ' + event.code + ' reason: ' + event.reason);
+                setTimeout(initWs, 500);
+            };
+
+            wsConnection.onerror = function (error) {
+                console.warn("Error  " + error.message);
+            };
+            wsConnection.onmessage = async (message) => {
+                console.log("message")
+                try {
+
+                } catch (e) {
+                    console.warn(e)
+                }
+            }
+        }
+
+        const wsSend = function (data) {
+            // readyState - true, если есть подключение
+            if (!wsConnection.readyState) {
+                setTimeout(function () {
+
+                    wsSend(data);
+
+                }, 100);
+            } else {
+                wsConnection.send(data);
+            }
+        };
+
+        const wsSend1 = function (data) {
+            var m = data.match(/.{1,512}/g);
+            for (var i = 0; i < m.length; i++) {
+                //sender: "controller", cmd: "startPrompt", newsid,
+                wsSend(JSON.stringify({ cmd: "blockData", sender: "controller", newsid, i: i, count: m.length - 1, val: m[i] }));
+            }
+
+        };
+
+
+        var elem = document.querySelector(".items")
+        var i = 0;
+        var work = () => {
+
+            if (app.isRunning) {
+
+                /* if (elem.getBoundingClientRect().height + i < 0 && app.delta>0) {
+                     app.isRunning = false
+                 }*/
+                if (elem.offsetHeight + i < elem.parentNode.offsetHeight - (elem.parentNode.offsetHeight / 2) && app.delta > 0)
+                    app.isPause = true;
+                if (i > 0 && app.delta < 0)
+                    app.isPause = true;
+                if (!app.isPause)
+                    i = i - app.delta;
+
+            }
+            elem.style.top = i + "px";
+            wsSend(JSON.stringify({ sender: "controller", cmd: "promptChange", newsid, config: this.config, val: i }));
+            setTimeout(() => {
+                work(i)
+            }, 400);
+
+        }
+        work(0);
+
+
+        const startPromprt = () => {
+            // wsSend(JSON.stringify({sender:"controller", cmd:"startPrompt", val:1}));
+        }
+        const stopPromprt = () => {
+            // wsSend(JSON.stringify({sender: "controller", cmd: "stopPrompt", val: 0}));
+        }
+        function updateSpeed() {
+            var elem = document.getElementById("pSpeedCtrlPoint")
+            if (elem)
+                elem.style.left = (((parseInt(app.delta) + 400) / 800) * 100) + "%"
+        }
+
+        document.getElementById("pSpeedCtrl").addEventListener("click", (e) => {
+
+
+            app.delta = (parseInt(865 * (e.offsetX / document.getElementById("pSpeedCtrl").getClientRects()[0].x) - 400))
+
+        })
+        setInputFilter(document.getElementById("pFontSize"), function (value) {
+            return /^\d*\.?\d*$/.test(value); // Allow digits and '.' only, using a RegExp
+        });
+
+        function setInputFilter(textbox, inputFilter) {
+            ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function (event) {
+                textbox.addEventListener(event, function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            });
+        }</script>
+</body>
+</html>

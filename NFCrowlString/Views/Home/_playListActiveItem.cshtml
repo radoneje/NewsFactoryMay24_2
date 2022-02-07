@@ -1,0 +1,39 @@
+﻿@model NFCrowlString.tSTR_item
+
+<div class="playListItem  activeItem newItem" id="@Model.id">
+    <div class="activeStopBtnWr" itemid="@Model.id"
+         onclick="var id='#'+ 'activeitemtopassive'+'@Model.id';$(id).click();">
+        <div class="activeStopBtn"></div>
+    </div>
+        @Ajax.ActionLink("D", "ActiveItemToPassive", new { itemId = Model.id }, new AjaxOptions
+               {
+                   HttpMethod = "POST",
+                   OnBegin = "$('.strActiveBox').find('#" + Model.id + "').addClass('forRemove')",
+                   OnSuccess = "$('.strActiveBox').find('#" + Model.id + "').slowRemove(function(){calculateActiveItems()}); $('.strPassiveBox').prepend(data); "
+               },
+               new { @class = "ActiveItemToPassiveBtn", @id = "activeitemtopassive"+Model.id })
+    
+    <div class="activeTextWr">
+        <div class="activeText">
+            @Model.text
+            </div>
+        <div class="activeMenu">
+            <div class="activeData">
+                @Model.dateModify.ToString("dd.MM.yyyy HH:mm")
+            </div>
+            <div class='activeTimer activeTimerState_@NFCrowlString.Models.Ctimer.getActiveTimerStatus(Model.id)'>
+
+            </div>
+            <div style="clear:both"></div>
+        </div>
+        </div>
+    <div class="activeDownBtnWr" >
+         <div class="activeUpBtn" onclick="activeItemUp(this)"></div>
+        <div class="activeDownBtn" onclick="activeItemDown(this)"></div>
+    </div>
+    <div style="clear:both"></div>
+    <script>
+        setTimeout(function () { $("#@Model.id").removeClass("newItem")});
+    </script>
+</div>
+

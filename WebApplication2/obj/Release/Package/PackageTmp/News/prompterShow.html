@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>May24 Prompter</title>
+    <link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/promptStyle.css">
+</head>
+<body>
+    <div class="pBody" id="app">
+        <div class="pBodyWr" id="pBodyWr">
+            <div id="pPrompt">
+                <div class="itemsWr">
+                    <div class="items">
+                        <div class="item" style="text-align: center;margin-bottom:20px">
+                            <svg style="width:2em" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 330 330" xml:space="preserve">
+<path fill="#ff00ff" id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
+</svg>
+                        </div><div class="item" v-for="block in promptBlocks" :id="'block'+block.Id"><div class="pitemTitle">{{block.TypeName}} {{block.Name}}</div><div class="pitemText" v-html="html(block.BlockText)"></div></div><div class="item" style="text-align: center;margin-bottom:20px">
+                            <svg style="width:2em;transform: rotate(180deg);" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 330 330" xml:space="preserve">
+<path fill="#ff00ff" id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"></path>
+</svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/scripts/vue.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const newsid = urlParams.get('newsid');
+        var app = new Vue({
+            el: "#app",
+            data: {
+                isRunning: false,
+                isPause: false,
+                delta: localStorage.getItem("delta") || 5,
+                blocks: [],
+                promptBlocks: [],
+                config: {
+                    fontSize: localStorage.getItem("pfontSize") || 72,
+                    mirror: true,
+                }
+            },
+            methods: {
+                html: function (txt) {
+                    txt = txt.replace(/\(\(SOT[^\)\)]+\)\)/g, "\r\n<span style='color:green; font-weight:bold'>SOT</span>\r\n")
+                    txt = txt.replace(/\(\([^\)\)]+\)\)/g, "")
+
+                    txt = txt.replace(/^[\r\n]{0,100}/, "");
+                    txt = txt.replace(/[\r\n]{2,100}/g, "</br></br>");
+
+                    txt = txt.replace(/\n/g, "</br>");
+                    return txt;
+                },
+                startPrompt: function () { },
+                resize: function () {
+                    var pPrompt = document.querySelector("#pPrompt");
+                    pPrompt.style.transform = "scale(" + document.body.clientWidth / pPrompt.clientWidth + ")"
+                    pPrompt.style.fontSize = this.config.fontSize + "px";
+                }
+            },
+            watch: {
+                config: function () {
+
+                    document.getElementById("pPrompt").style.fontSize = this.config.fontSize + "px";
+                    var mirror = this.config.mirror == "true" || this.config.mirror == true;
+                    document.getElementById("pBodyWr").style.transform = "scaleX(" + (mirror ? -1 : 1) + ")"
+                }
+            },
+            mounted: async function () {
+                this.resize();
+                window.addEventListener('resize', () => { this.resize(); }, true);
+            }
+        });
+        var elem = document.querySelector(".items")
+
+
+        var wsConnection;
+        initWs();
+        function initWs() {
+            wsConnection = new WebSocket("ws://" + document.location.host + "/ws.ashx");
+
+            wsConnection.onopen = function () {
+                console.log("Соединение установлено.");
+                var buf = [];
+                wsConnection.onmessage = async (message) => {
+                    try {
+                        var msg = await message.data;
+                       
+                        
+                       
+                        var data = JSON.parse(msg)
+                        
+                        if (data.sender == "controller" && data.newsid ==  newsid) {
+
+                            if (data.cmd == "blockData") {
+                                if (data.i == 0) {
+                                    buf = [];
+                                    console.log("111", data.val)
+                                }
+                                buf.push(data.val)
+                                if (data.i == data.count) {
+                                    var json = "";
+                                    buf.forEach(b => {
+                                        json = json + b;
+                                    })
+                                    console.log("end==>", json)
+                                    app.promptBlocks= JSON.parse(json);
+                                }
+
+                                //  app.promptBlocks =JSON.parse( data.val)
+                            }
+                            if (data.cmd == "startPrompt") {
+                                app.config = data.config;
+
+                              //  app.promptBlocks =JSON.parse( data.val)
+                            }
+                            if (data.cmd == "stopPrompt") {
+                                app.config = data.config;
+
+                                app.promptBlocks = []
+                            }
+
+                            if (data.cmd == "promptChange") {
+                                elem.style.top = data.val + "px";
+                            }
+
+
+                        }
+                    } catch (e) {
+                        console.warn(e)
+                    }
+                    // console.log("message ",message.data);
+                }
+            };
+
+            wsConnection.onclose = function (event) {
+                if (event.wasClean) {
+                    console.log('Соединение закрыто чисто');
+                } else {
+                    console.log('Обрыв соединения'); // например, "убит" процесс сервера
+                }
+                console.log('Код: ' + event.code + ' причина: ' + event.reason);
+                setTimeout(initWs, 500);
+            };
+
+            wsConnection.onerror = function (error) {
+                console.log("Ошибка " + error.message);
+            };
+        }
+
+        const wsSend = function (data) {
+            // readyState - true, если есть подключение
+            if (!wsConnection.readyState) {
+                setTimeout(function () {
+                    wsSend(data);
+                }, 100);
+            } else {
+                wsConnection.send(data);
+            }
+        };</script>
+</body>
+</html>

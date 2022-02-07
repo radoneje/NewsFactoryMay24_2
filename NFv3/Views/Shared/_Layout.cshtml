@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Reset.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/roboto.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/mainStyle.css" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/popper.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+   
+</head>
+<body>
+    <div class="mainWr">
+        <header>
+            <div class="mainLogo">
+                <img src="~/images/NewsFactoryLogoW300_notext.png" />
+            </div>
+            <div class="mainFunc">
+                <div>help</div>
+                <div>lang</div>
+                @if (System.Web.HttpContext.Current.User.Identity.IsAuthenticated)
+                {
+                    <div>exit</div>
+                }
+            </div>
+            <div style="clear:both"></div>
+        </header>
+        @RenderBody()
+    </div>
+</body>
+</html>

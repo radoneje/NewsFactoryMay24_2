@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.625" name="CynegyDataClasses">
+  <DataContextMoniker Name="/CynegyDataClassesDataContext" />
+  <nestedChildShapes>
+    <classShape Id="c2801991-cbae-447b-8057-b968b6a54634" absoluteBounds="5.125, 1.25, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/job_subject" />
+      <nestedChildShapes>
+        <elementListCompartment Id="846cc04c-4ed9-4766-bcd8-42954c4c46a6" absoluteBounds="5.14, 1.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="18360576-d6f9-4b7f-b3bb-76155779d468" absoluteBounds="3.75, 4.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/nodes_ex3" />
+      <nestedChildShapes>
+        <elementListCompartment Id="01ccb836-cf3a-4a8f-bd95-59346c18296a" absoluteBounds="3.765, 5.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="cee9910f-e3e7-4214-80f7-2a3cb720d3e8" absoluteBounds="6.75, 3.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/nodes_ex2" />
+      <nestedChildShapes>
+        <elementListCompartment Id="7fddc463-490a-4f1c-a129-559b657c208f" absoluteBounds="6.765, 4.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="10b2a46f-f357-4f0c-beca-2aa926e0de86" absoluteBounds="2.875, 2.25, 2, 2.7324039713541666">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/nodes" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1b2e1e09-be97-41c6-9955-5cfc985a045d" absoluteBounds="2.89, 2.71, 1.9700000000000002, 2.1724039713541665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="1e3adbe9-6168-492a-8bbe-0558c9bd9520" absoluteBounds="2, 5.25, 2, 1.3862939453125">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/nodes_ex1" />
+      <nestedChildShapes>
+        <elementListCompartment Id="af3de9ac-80b2-475b-abd8-a70ee778f6ee" absoluteBounds="2.015, 5.71, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f6f16e5e-6d33-40c7-87c0-12f69d27d9d8" absoluteBounds="7.125, 6.25, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/job" />
+      <nestedChildShapes>
+        <elementListCompartment Id="d64ac221-6441-44b5-b0b0-69fd8229d822" absoluteBounds="7.14, 6.71, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="b46f43b2-d642-4952-acd8-655a0ce0b668" absoluteBounds="5.625, 5, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/CynegyDataClassesDataContext/v_files" />
+      <nestedChildShapes>
+        <elementListCompartment Id="726e4ebc-c40d-49c1-8330-be5b44905855" absoluteBounds="5.64, 5.46, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

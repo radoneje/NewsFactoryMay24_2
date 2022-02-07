@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="NewsFactory" Class="DataClassesMediaDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost,1433;Initial Catalog=NewsFactory;User ID=NewsFactoryUser" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="NewsFactoryConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.vWeb_MediaForList" Member="vWeb_MediaForLists">
+    <Type Name="vWeb_MediaForList">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(256) NOT NULL" CanBeNull="false" />
+      <Column Name="BLockType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreatorId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="OperatorId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="JockeyId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="BlockTime" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="TaskTime" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="CalcTime" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="BlockText" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="Ready" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Approve" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TextLang1" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TextLang2" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TextLang3" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ParentId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_FileWIthFolderToLIst" Member="vMedia_FileWIthFolderToLIsts">
+    <Type Name="vMedia_FileWIthFolderToLIst">
+      <Column Name="FolderGuid" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="FolderId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="FolderREady" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Ready" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FolderPAth" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="FileCountInFOlder" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FIleId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="FileGuid" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="FileName" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="FIleREady" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="NumberInFolder" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FileSize" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="sSourceIp" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="StartDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EndDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="BlockType" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_ThumbnailsForList" Member="vMedia_ThumbnailsForLists">
+    <Type Name="vMedia_ThumbnailsForList">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="DateAdd" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Number" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="image" Type="System.Data.Linq.Binary" DbType="Image NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="FileGuid" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_EncoderTask" Member="vMedia_EncoderTasks">
+    <Type Name="vMedia_EncoderTask">
+      <Column Name="id" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="EncoderGuid" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="DateLastStart" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="IsActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ErrorCount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IsComplite" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="FileGuid" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="FileName" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="LRVFileName" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="LRVPath" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_ListForGenerateLRV" Member="vMedia_ListForGenerateLRVs">
+    <Type Name="vMedia_ListForGenerateLRV">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PicSource" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_ListForGenerateTh" Member="vMedia_ListForGenerateThs">
+    <Type Name="vMedia_ListForGenerateTh">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PicSource" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vMedia_ListForGenerateImages" Member="vMedia_ListForGenerateImages">
+    <Type Name="vMedia_ListForGenerateImage">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PicSource" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vWeb_ArchiveMediaForList" Member="vWeb_ArchiveMediaForLists">
+    <Type Name="vWeb_ArchiveMediaForList">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="BLockType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreatorId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="OperatorId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="JockeyId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockTime" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TaskTime" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CalcTime" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BlockText" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="Ready" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Approve" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TextLang1" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TextLang2" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TextLang3" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ParentId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tWeb_MediaTask" Member="tWeb_MediaTasks">
+    <Type Name="tWeb_MediaTask">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="MediaId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="DateAdd" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="DateAddComplite" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="LRVStatus" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LRVCount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="LRVMessage" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="LRVLastDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="PICStatus" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PICCount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PICMessage" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="PICLastDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="isComplite" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tWeb_GraphicsLayers" Member="tWeb_GraphicsLayers">
+    <Type Name="tWeb_GraphicsLayer">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="title" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="deleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="dateCreation" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="tWeb_GraphicsLayer_tWeb_mediaGraphic" Member="tWeb_mediaGraphics" AccessModifier="Internal" ThisKey="id" OtherKey="layerId" Type="tWeb_mediaGraphic" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tWeb_MediaGraphicsItems" Member="tWeb_MediaGraphicsItems">
+    <Type Name="tWeb_MediaGraphicsItem">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="mediaGraphicsId" Type="System.String" DbType="NVarChar(90) NOT NULL" CanBeNull="false" />
+      <Column Name="timeInSec" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="text" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="tWeb_mediaGraphic_tWeb_MediaGraphicsItem" Member="tWeb_mediaGraphic" AccessModifier="Internal" ThisKey="mediaGraphicsId" OtherKey="id" Type="tWeb_mediaGraphic" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tWeb_mediaGraphic" Member="tWeb_mediaGraphics">
+    <Type Name="tWeb_mediaGraphic">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="layerId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="MediaId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="tWeb_mediaGraphic_tWeb_MediaGraphicsItem" Member="tWeb_MediaGraphicsItems" AccessModifier="Internal" ThisKey="id" OtherKey="mediaGraphicsId" Type="tWeb_MediaGraphicsItem" />
+      <Association Name="tWeb_GraphicsLayer_tWeb_mediaGraphic" Member="tWeb_GraphicsLayer" AccessModifier="Internal" ThisKey="layerId" OtherKey="id" Type="tWeb_GraphicsLayer" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vWeb_mobileView" Member="vWeb_mobileView">
+    <Type Name="vWeb_mobileView">
+      <Column Name="id" Type="System.String" DbType="NVarChar(90) NOT NULL" CanBeNull="false" />
+      <Column Name="insertDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="message" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="imgFile" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Function Name="dbo.pWeb_ChekUserCookie" Method="pWeb_ChekUserCookie">
+    <Parameter Name="Coockie" Parameter="coockie" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_Rename" Method="pMedia_Rename">
+    <Parameter Name="MediaId" Parameter="mediaId" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="Name" Parameter="name" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_UpdateSort" Method="pMedia_UpdateSort">
+    <Parameter Name="MediaId" Parameter="mediaId" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="SortOrder" Parameter="sortOrder" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_UpdateStatus" Method="pMedia_UpdateStatus">
+    <Parameter Name="MediaId" Parameter="mediaId" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="Ready" Parameter="ready" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="Approve" Parameter="approve" Type="System.Boolean" DbType="Bit" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_Delete" Method="pMedia_Delete">
+    <Parameter Name="MediaId" Parameter="mediaId" Type="System.Int64" DbType="BigInt" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FileUploadedAddToBlock" Method="pMedia_FileUploadedAddToBlock">
+    <Parameter Name="BlockGUID" Parameter="blockGUID" Type="System.String" DbType="NVarChar(1024)" />
+    <Parameter Name="FilePath" Parameter="filePath" Type="System.String" DbType="NText" />
+    <Parameter Name="MediaName" Parameter="mediaName" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="MediaTypeID" Parameter="mediaTypeID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FoldersUpdate" Method="pMedia_FoldersUpdate">
+    <Parameter Name="FolderGuid" Parameter="folderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="Ready" Parameter="ready" Type="System.Boolean" DbType="Bit" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FilesAdd" Method="pMedia_FilesAdd">
+    <Parameter Name="FileGuid" Parameter="fileGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="FolderGuid" Parameter="folderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="FileName" Parameter="fileName" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="Ready" Parameter="ready" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="NumberInFolder" Parameter="numberInFolder" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Size" Parameter="size" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="sSourceIp" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="StartDate" Parameter="startDate" Type="System.DateTime" DbType="DateTime" />
+    <Parameter Name="BlockType" Parameter="blockType" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FoldersAdd" Method="pMedia_FoldersAdd">
+    <Parameter Name="sFolderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="bReady" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="sPath" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="iFilesCount" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FilesUpdate" Method="pMedia_FilesUpdate">
+    <Parameter Name="FileGuid" Parameter="fileGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="BytesWrite" Parameter="bytesWrite" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="EndDate" Parameter="endDate" Type="System.DateTime" DbType="DateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_ChunkAdd" Method="pMedia_ChunkAdd">
+    <Parameter Name="BytesStart" Parameter="bytesStart" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="BytesEnd" Parameter="bytesEnd" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="BytesWrite" Parameter="bytesWrite" Type="System.Int64" DbType="BigInt" />
+    <Parameter Name="FileGuid" Parameter="fileGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_EncoderSetTaskActive" Method="pMedia_EncoderSetTaskActive">
+    <Parameter Name="TaskId" Parameter="taskId" Type="System.Int32" DbType="Int" />
+    <Parameter Name="EncoderGuid" Parameter="encoderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_FilesLrvUpdate" Method="pMedia_FilesLrvUpdate">
+    <Parameter Name="EncoderGuid" Parameter="encoderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="LrvFileName" Parameter="lrvFileName" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="LrvFilePath" Parameter="lrvFilePath" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="LrvStatus" Parameter="lrvStatus" Type="System.Boolean" DbType="Bit" />
+    <Parameter Name="EncoderIsActive" Parameter="encoderIsActive" Type="System.Boolean" DbType="Bit" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_EncoderSetTaskDisActive" Method="pMedia_EncoderSetTaskDisActive">
+    <Parameter Name="EncoderGuid" Parameter="encoderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_EncoderSetTaskError" Method="pMedia_EncoderSetTaskError">
+    <Parameter Name="EncoderGuid" Parameter="encoderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_ThumbnailInsertFromImage" Method="pMedia_ThumbnailInsertFromImage">
+    <Parameter Name="FileGuid" Parameter="fileGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="Img" Parameter="img" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Parameter Name="Th1" Parameter="th1" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Parameter Name="th2" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_ThumbnailInsert" Method="pMedia_ThumbnailInsert">
+    <Parameter Name="EncoderGuid" Parameter="encoderGuid" Type="System.String" DbType="NVarChar(255)" />
+    <Parameter Name="Img" Parameter="img" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Parameter Name="number" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Th1" Parameter="th1" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Parameter Name="Th2" Parameter="th2" Type="System.Data.Linq.Binary" DbType="Image" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_AddLRV" Method="pMedia_AddLRV">
+    <Parameter Name="Id" Parameter="id" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Status" Parameter="status" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Path" Parameter="path" Type="System.String" DbType="NText" />
+    <Parameter Name="Message" Parameter="message" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_AddImage" Method="pMedia_AddImage">
+    <Parameter Name="Id" Parameter="id" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Status" Parameter="status" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Path" Parameter="path" Type="System.String" DbType="NText" />
+    <Parameter Name="Message" Parameter="message" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_AddImage" Method="pMedia_AddImage1">
+    <Parameter Name="Id" Parameter="id" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Status" Parameter="status" Type="System.Int32" DbType="Int" />
+    <Parameter Name="Path" Parameter="path" Type="System.String" DbType="NText" />
+    <Parameter Name="Message" Parameter="message" Type="System.String" DbType="NVarChar(255)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.pMedia_SortAlphablet" Method="pMedia_SortAlphablet">
+    <Parameter Name="parentId" Type="System.Int64" DbType="BigInt" />
+    <Return Type="System.Int32" />
+  </Function>
+</Database>

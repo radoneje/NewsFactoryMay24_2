@@ -1,0 +1,27 @@
+﻿body{
+    font-family: 'Roboto';
+    color:#333;
+}
+.mainLogo{
+    float:left
+}
+.mainWr{
+    padding:10px;
+}
+.mainLogo img{
+    width:100px;
+}
+.mainFunc div{
+    color:#aaa;
+    transition:color .3s ease;
+    float:right;
+    margin:0 .25em;
+    cursor:pointer;
+}
+.mainFunc div:hover{
+    color:#333;
+}
+.centered{
+    width:600px;
+    margin:.3vh auto;
+}

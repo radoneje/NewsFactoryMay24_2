@@ -1,0 +1,1963 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{615708D9-7FEE-49C6-8587-87F177E8AA23}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WebApplication2</RootNamespace>
+    <AssemblyName>NWMay24</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
+    <TargetFrameworkProfile />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AForge">
+      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video">
+      <HintPath>..\packages\AForge.Video.2.2.5\lib\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AjaxControlToolkit">
+      <HintPath>..\packages\AjaxControlToolkit.7.1213\lib\45\AjaxControlToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="AjaxMin">
+      <HintPath>..\packages\AjaxMin.4.97.4951.28483\lib\net40\AjaxMin.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AspNet.ScriptManager.jQuery, Version=2.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AspNet.ScriptManager.jQuery.2.1.3\lib\net40\AspNet.ScriptManager.jQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="AspNet.ScriptManager.jQuery.UI.Combined, Version=1.12.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AspNet.ScriptManager.jQuery.UI.Combined.1.12.1\lib\net45\AspNet.ScriptManager.jQuery.UI.Combined.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Binbin.Linq.PredicateBuilder">
+      <HintPath>..\packages\Binbin.Linq.PredicateBuilder.1.0.1.24783\lib\net40\Binbin.Linq.PredicateBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\ExcelLibrary_20110730\ExcelLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqKit">
+      <HintPath>..\packages\LinqKit.1.0\lib\35\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData">
+      <HintPath>..\packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.2.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.0\lib\net451\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.0\lib\net451\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WebSockets, Version=0.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WebSockets.0.2.3.1\lib\net45\Microsoft.WebSockets.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration">
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.8.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage">
+      <HintPath>..\packages\WindowsAzure.Storage.2.1.0.3\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NFMAY24KeyEncript">
+      <HintPath>..\..\NFWMay24Service\NFMAY24KeyEncript\bin\Release\NFMAY24KeyEncript.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Sprache, Version=1.10.0.35, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sprache.1.10.0.35\lib\net40\Sprache.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.4\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Spatial">
+      <HintPath>..\packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Web.Helpers\v4.0_1.0.0.0__31bf3856ad364e35\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.4\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.4\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.0\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Providers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.AspNet.Providers.Core.2.0.0\lib\net40\System.Web.Providers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.FriendlyUrls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.AspNet.FriendlyUrls.Core.1.0.0\lib\net40\Microsoft.AspNet.FriendlyUrls.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebActivatorEx">
+      <HintPath>..\packages\WebActivatorEx.2.0.2\lib\net40\WebActivatorEx.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <HintPath>..\packages\WebGrease.1.3.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="!!!FFMpegSettingsMP4.txt" />
+    <Content Include="!!!sqlUpdate2.txt" />
+    <Content Include="!!dbUpdate.txt" />
+    <Content Include="About.aspx" />
+    <Content Include="badBrowser.html" />
+    <Content Include="BlockScript.aspx" />
+    <Content Include="Blocks\ArchiveBlocksConteiner.ascx" />
+    <Content Include="Blocks\blockDeleted.aspx" />
+    <Content Include="Blocks\BlockEditor.aspx" />
+    <Content Include="Blocks\BlockEditorPlayer.ascx" />
+    <Content Include="Blocks\BlockExtViewer.aspx" />
+    <Content Include="Blocks\blockHistory.aspx" />
+    <Content Include="Blocks\blockInplaceEditorMenu.aspx" />
+    <Content Include="Blocks\BlockPanel.ascx" />
+    <Content Include="Blocks\blockSocial.aspx" />
+    <Content Include="Blocks\ExtLinkButton.ascx" />
+    <Content Include="Blocks\GetImage.aspx" />
+    <Content Include="Blocks\LentaBlocksConteiner.ascx" />
+    <Content Include="Blocks\PartnersBlocksConteiner.ascx" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap-theme.css" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap-theme.min.css" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap.css" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap.min.css" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\js\bootstrap.js" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\js\bootstrap.min.js" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\js\npm.js" />
+    <Content Include="Contact.aspx" />
+    <Content Include="Content\datepicker.css" />
+    <Content Include="Content\datepicker3.css" />
+    <Content Include="Content\daterangepicker-bs2.css" />
+    <Content Include="Content\daterangepicker-bs3.css" />
+    <Content Include="Content\jquery-ui-timepicker-addon.min.css" />
+    <Content Include="Content\jquery.timepicker.css" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Content\video-js.css" />
+    <Content Include="Content\video-js.min.css" />
+    <Content Include="Content\video-js.swf" />
+    <Content Include="dbUpdates\tWeb_GraphicsLayers.sql" />
+    <Content Include="Elements\adminForm.aspx" />
+    <Content Include="Elements\adminPlayOutItem.aspx" />
+    <Content Include="Elements\BlocksExtViewer\AlertPanel.ascx" />
+    <Content Include="Elements\BlocksExtViewer\BlockMediaPanel.ascx" />
+    <Content Include="Elements\BlocksExtViewer\BlockNamePanel.ascx" />
+    <Content Include="Elements\BlocksExtViewer\MediaItem.ascx" />
+    <Content Include="Elements\BlocksExtViewer\MediaPlayer.ascx" />
+    <Content Include="Elements\BlocksExtViewer\SuccessPanel.ascx" />
+    <Content Include="Elements\chernovik.aspx" />
+    <Content Include="Elements\LoginAlertPanel.ascx" />
+    <Content Include="Elements\mainVideoPlayer.aspx" />
+    <Content Include="Elements\mainVideoPlayerElement.aspx" />
+    <Content Include="Elements\playoutTask.ascx" />
+    <Content Include="Elements\playOutTasks.aspx" />
+    <Content Include="Elements\printTemplateEditor.aspx" />
+    <Content Include="Elements\ProgramComoBox.ascx" />
+    <Content Include="Elements\sotEditor.aspx" />
+    <Content Include="Elements\statForm.aspx" />
+    <Content Include="Elements\SubBlockImageControl.aspx" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\vjs.svg" />
+    <Content Include="Images\accent.png" />
+    <Content Include="Images\ajax-loader-whell.gif" />
+    <Content Include="Images\ajax-loader.gif" />
+    <Content Include="Images\cutter_icon.png" />
+    <Content Include="Images\document.svg" />
+    <Content Include="Images\folder_icon.svg" />
+    <Content Include="Images\hide.svg" />
+    <Content Include="Images\loading.gif" />
+    <Content Include="Images\bullet.png" />
+    <Content Include="Images\DefaultPlayer.jpg" />
+    <Content Include="Images\glyphicons\png\glyphicons-1-glass.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-10-magic.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-100-vector-path-all.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-101-font.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-102-italic.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-103-bold.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-104-text-underline.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-105-text-strike.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-106-text-height.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-107-text-width.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-108-text-resize.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-109-left-indent.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-11-envelope.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-110-right-indent.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-111-align-left.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-112-align-center.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-113-align-right.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-114-justify.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-115-list.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-116-text-smaller.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-117-text-bigger.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-118-embed.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-119-embed-close.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-12-camera.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-120-table.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-121-message-full.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-122-message-empty.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-123-message-in.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-124-message-out.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-125-message-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-126-message-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-127-message-ban.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-128-message-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-129-message-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-13-heart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-130-message-new.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-131-inbox.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-132-inbox-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-133-inbox-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-134-inbox-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-135-inbox-in.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-136-inbox-out.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-137-cogwheel.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-138-cogwheels.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-139-picture.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-14-beach-umbrella.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-140-adjust-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-141-database-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-142-database-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-143-database-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-144-database-ban.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-145-folder-open.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-146-folder-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-147-folder-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-148-folder-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-149-folder-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-15-train.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-150-folder-new.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-151-edit.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-152-new-window.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-153-check.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-154-unchecked.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-155-more-windows.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-156-show-big-thumbnails.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-157-show-thumbnails.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-158-show-thumbnails-with-lines.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-159-show-lines.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-16-print.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-160-playlist.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-161-imac.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-162-macbook.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-163-ipad.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-164-iphone.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-165-iphone-transfer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-166-iphone-exchange.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-167-ipod.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-168-ipod-shuffle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-169-ear-plugs.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-17-bin.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-170-record.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-171-step-backward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-172-fast-backward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-173-rewind.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-174-play.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-175-pause.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-176-stop.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-177-forward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-178-fast-forward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-179-step-forward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-18-music.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-180-eject.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-181-facetime-video.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-182-download-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-183-mute.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-184-volume-down.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-185-volume-up.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-186-screenshot.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-187-move.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-188-more.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-189-brightness-reduce.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-19-note.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-190-brightness-increase.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-191-circle-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-192-circle-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-193-circle-remove.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-194-circle-ok.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-195-circle-question-mark.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-196-circle-info.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-197-circle-exclamation-mark.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-198-remove.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-199-ok.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-2-leaf.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-20-heart-empty.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-200-ban.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-201-download.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-202-upload.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-203-shopping-cart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-204-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-205-unlock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-206-electricity.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-207-ok-2.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-208-remove-2.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-209-cart-out.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-21-home.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-210-cart-in.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-211-left-arrow.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-212-right-arrow.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-213-down-arrow.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-214-up-arrow.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-215-resize-small.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-216-resize-full.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-217-circle-arrow-left.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-218-circle-arrow-right.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-219-circle-arrow-top.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-22-snowflake.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-220-circle-arrow-down.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-221-play-button.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-222-unshare.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-223-share.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-224-chevron-right.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-225-chevron-left.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-226-bluetooth.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-227-euro.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-228-usd.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-229-gbp.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-23-fire.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-230-retweet-2.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-231-moon.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-232-sun.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-233-cloud.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-234-direction.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-235-brush.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-236-pen.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-237-zoom-in.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-238-zoom-out.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-239-pin.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-24-magnet.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-240-albums.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-241-rotation-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-242-flash.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-243-google-maps.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-244-anchor.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-245-conversation.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-246-chat.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-247-male.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-248-female.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-249-asterisk.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-25-parents.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-250-divide.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-251-snorkel-diving.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-252-scuba-diving.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-253-oxygen-bottle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-254-fins.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-255-fishes.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-256-boat.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-257-delete.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-258-sheriffs-star.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-259-qrcode.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-26-binoculars.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-260-barcode.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-261-pool.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-262-buoy.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-263-spade.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-264-bank.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-265-vcard.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-266-electrical-plug.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-267-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-268-credit-card.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-269-keyboard-wireless.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-27-road.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-270-keyboard-wired.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-271-shield.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-272-ring.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-273-cake.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-274-drink.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-275-beer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-276-fast-food.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-277-cutlery.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-278-pizza.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-279-birthday-cake.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-28-search.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-280-tablet.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-281-settings.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-282-bullets.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-283-cardio.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-284-t-shirt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-285-pants.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-286-sweater.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-287-fabric.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-288-leather.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-289-scissors.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-29-cars.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-290-bomb.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-291-skull.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-292-celebration.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-293-tea-kettle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-294-french-press.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-295-coffee-cup.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-296-pot.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-297-grater.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-298-kettle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-299-hospital.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-3-dog.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-30-notes-2.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-300-hospital-h.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-301-microphone.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-302-webcam.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-303-temple-christianity-church.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-304-temple-islam.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-305-temple-hindu.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-306-temple-buddhist.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-307-bicycle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-308-life-preserver.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-309-share-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-31-pencil.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-310-comments.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-311-flower.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-312-baseball.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-313-rugby.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-314-ax.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-315-table-tennis.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-316-bowling.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-317-tree-conifer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-318-tree-deciduous.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-319-more-items.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-32-bus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-320-sort.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-321-filter.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-322-gamepad.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-323-playing-dices.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-324-calculator.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-325-tie.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-326-wallet.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-327-piano.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-328-sampler.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-329-podium.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-33-wifi-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-330-soccer-ball.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-331-blog.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-332-dashboard.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-333-certificate.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-334-bell.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-335-candle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-336-pushpin.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-337-iphone-shake.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-338-pin-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-339-turtle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-34-luggage.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-340-rabbit.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-341-globe.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-342-briefcase.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-343-hdd.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-344-thumbs-up.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-345-thumbs-down.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-346-hand-right.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-347-hand-left.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-348-hand-up.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-349-hand-down.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-35-old-man.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-350-fullscreen.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-351-shopping-bag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-352-book-open.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-353-nameplate.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-354-nameplate-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-355-vases.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-356-bullhorn.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-357-dumbbell.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-358-suitcase.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-359-file-import.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-36-woman.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-360-file-export.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-361-bug.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-362-crown.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-363-smoking.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-364-cloud-download.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-365-cloud-upload.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-366-restart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-367-security-camera.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-368-expand.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-369-collapse.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-37-file.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-370-collapse-top.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-371-globe-af.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-372-global.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-373-spray.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-374-nails.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-375-claw-hammer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-376-classic-hammer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-377-hand-saw.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-378-riflescope.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-379-electrical-socket-eu.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-38-coins.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-380-electrical-socket-us.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-381-message-forward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-382-coat-hanger.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-383-dress.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-384-bathrobe.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-385-shirt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-386-underwear.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-387-log-in.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-388-log-out.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-389-exit.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-39-airplane.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-390-new-window-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-391-video-sd.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-392-video-hd.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-393-subtitles.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-394-sound-stereo.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-395-sound-dolby.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-396-sound-5-1.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-397-sound-6-1.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-398-sound-7-1.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-399-copyright-mark.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-4-user.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-40-notes.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-400-registration-mark.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-401-radar.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-402-skateboard.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-403-golf-course.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-404-sorting.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-405-sort-by-alphabet.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-406-sort-by-alphabet-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-407-sort-by-order.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-408-sort-by-order-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-409-sort-by-attributes.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-41-stats.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-410-sort-by-attributes-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-411-compressed.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-412-package.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-413-cloud-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-414-cloud-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-415-disk-save.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-416-disk-open.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-417-disk-saved.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-418-disk-remove.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-419-disk-import.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-42-charts.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-420-disk-export.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-421-tower.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-422-send.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-423-git-branch.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-424-git-create.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-425-git-private.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-426-git-delete.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-427-git-merge.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-428-git-pull-request.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-429-git-compare.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-43-pie-chart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-430-git-commit.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-431-construction-cone.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-432-shoe-steps.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-433-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-434-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-435-redo.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-436-undo.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-437-golf.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-438-hockey.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-439-pipe.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-44-group.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-440-wrench.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-441-folder-closed.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-442-phone-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-443-earphone.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-444-floppy-disk.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-445-floppy-saved.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-446-floppy-remove.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-447-floppy-save.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-448-floppy-open.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-449-translate.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-45-keys.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-450-fax.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-451-factory.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-452-shop-window.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-453-shop.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-454-kiosk.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-455-kiosk-wheels.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-456-kiosk-light.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-457-kiosk-food.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-458-transfer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-459-money.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-46-calendar.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-460-header.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-461-blacksmith.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-462-saw-blade.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-463-basketball.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-464-server.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-465-server-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-466-server-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-467-server-ban.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-468-server-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-469-server-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-47-router.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-470-server-new.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-471-elec-station.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-472-gas-station.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-473-target.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-474-bed-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-475-mosquito-net.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-476-dining-set.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-477-plate-of-food.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-478-hygiene-kit.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-479-blackboard.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-48-camera-small.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-480-marriage.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-481-bucket.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-482-none-color-swatch.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-483-bring-forward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-484-bring-to-front.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-485-send-backward.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-486-send-to-back.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-487-fit-frame-to-image.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-488-fit-image-to-frame.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-489-multiple-displays.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-49-star-empty.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-490-handshake.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-491-child.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-492-baby-formula.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-493-medicine.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-494-atv-vehicle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-495-motorcycle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-496-bed.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-497-tent.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-498-glasses.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-499-sunglasses.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-5-girl.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-50-star.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-500-family.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-501-education.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-502-shoes.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-503-map.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-504-cd.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-505-alert.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-506-piggy-bank.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-507-star-half.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-508-cluster.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-509-flowchart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-51-link.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-510-commodities.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-511-duplicate.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-512-copy.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-513-paste.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-514-bath-bathtub.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-515-bath-shower.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-516-shower.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-517-menu-hamburger.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-518-option-vertical.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-519-option-horizontal.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-52-eye-open.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-520-currency-conversion.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-521-user-ban.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-522-user-lock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-523-user-flag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-524-user-asterisk.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-525-user-alert.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-526-user-key.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-527-user-conversation.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-528-database.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-529-database-search.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-53-eye-close.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-530-list-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-531-hazard-sign.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-532-hazard.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-533-stop-sign.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-534-lab.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-535-lab-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-536-ice-cream.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-537-ice-lolly.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-538-ice-lolly-tasted.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-539-invoice.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-54-alarm.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-540-cart-tick.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-541-hourglass.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-542-cat.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-543-lamp.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-544-scale-classic.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-545-eye-plus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-546-eye-minus.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-547-quote.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-548-bitcoin.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-549-yen.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-55-clock.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-550-ruble.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-551-erase.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-552-podcast.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-553-firework.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-554-scale.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-555-king.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-556-queen.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-557-pawn.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-558-bishop.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-559-knight.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-56-stopwatch.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-560-mic-mute.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-561-voicemail.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-562-paragraph.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-563-person-walking.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-564-person-wheelchair.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-565-underground.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-566-car-hov.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-567-car-rental.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-568-transport.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-569-taxi.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-57-projector.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-570-ice-cream-no.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-571-uk-rat-u.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-572-uk-rat-pg.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-573-uk-rat-12a.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-574-uk-rat-12.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-575-uk-rat-15.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-576-uk-rat-18.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-577-uk-rat-r18.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-578-tv.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-579-sms.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-58-history.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-580-mms.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-581-us-rat-g.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-582-us-rat-pg.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-583-us-rat-pg-13.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-584-us-rat-restricted.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-585-us-rat-no-one-17.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-586-equalizer.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-587-speakers.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-588-remote-control.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-589-remote-control-tv.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-59-truck.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-590-shredder.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-591-folder-heart.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-592-person-running.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-593-person.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-594-voice.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-595-stethoscope.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-596-hotspot.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-597-activity.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-598-watch.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-599-scissors-alt.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-6-car.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-60-cargo.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-600-car-wheel.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-601-chevron-up.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-602-chevron-down.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-603-superscript.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-604-subscript.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-605-text-size.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-606-text-color.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-607-text-background.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-608-modal-window.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-609-newspaper.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-61-compass.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-610-tractor.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-62-keynote.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-63-paperclip.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-64-power.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-65-lightbulb.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-66-tag.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-67-tags.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-68-cleaning.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-69-ruler.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-7-user-add.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-70-gift.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-71-umbrella.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-72-book.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-73-bookmark.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-74-wifi.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-75-cup.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-76-stroller.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-77-headphones.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-78-headset.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-79-warning-sign.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-8-user-remove.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-80-signal.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-81-retweet.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-82-refresh.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-83-roundabout.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-84-random.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-85-heat.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-86-repeat.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-87-display.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-88-log-book.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-89-address-book.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-9-film.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-90-building.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-91-eyedropper.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-92-adjust.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-93-tint.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-94-crop.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-95-vector-path-square.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-96-vector-path-circle.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-97-vector-path-polygon.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-98-vector-path-line.png" />
+    <Content Include="Images\glyphicons\png\glyphicons-99-vector-path-curve.png" />
+    <Content Include="Images\green_list.png" />
+    <Content Include="Images\heroAccent.png" />
+    <Content Include="Images\lang\azer-1.png" />
+    <Content Include="Images\lang\Eng-1.png" />
+    <Content Include="Images\lang\rus1.png" />
+    <Content Include="Images\may24Logo.svg" />
+    <Content Include="Images\NewsFactoryLogoW300_notext.png" />
+    <Content Include="Images\noimage.jpg" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\picture.svg" />
+    <Content Include="Images\red_list.png" />
+    <Content Include="Images\roll_icon.png" />
+    <Content Include="Images\screenshot.jpg" />
+    <Content Include="Images\show.svg" />
+    <Content Include="Images\video-play-button.svg" />
+    <Content Include="Images\yellow_list.png" />
+    <Content Include="Images\zag.svg" />
+    <Content Include="Index.aspx" />
+    <Content Include="LIte\BlocksElements\BlockHead.ascx" />
+    <Content Include="LIte\BlocksElements\BlockItem.ascx" />
+    <Content Include="LIte\BlocksElements\BlocksColumn.ascx" />
+    <Content Include="LIte\LiteBlockEditor.aspx" />
+    <Content Include="LIte\LiteContainer.ascx" />
+    <Content Include="LIte\NewsElements\NewsColumn.ascx" />
+    <Content Include="LIte\NewsElements\NewsItem.ascx" />
+    <Content Include="News\ArchiveNews.ascx" />
+    <Content Include="News\NewsTitles.html" />
+    <Content Include="News\LentaNews.ascx" />
+    <Content Include="News\newsDeleted.aspx" />
+    <Content Include="News\NewsEditor.aspx" />
+    <Content Include="News\newsToTitle.aspx" />
+    <Content Include="News\PartnersNews.ascx" />
+    <Content Include="News\prompter.html" />
+    <Content Include="News\prompterShow.html" />
+    <Content Include="News\rssNews.ascx" />
+    <Content Include="News\rssNews.html" />
+    <Content Include="News\title.aspx" />
+    <Content Include="Release notes.txt" />
+    <Content Include="Resources\lang4.js" />
+    <Content Include="Resources\lang2.js" />
+    <Content Include="Resources\lang1.js" />
+    <Content Include="Resources\lang0.js" />
+    <Content Include="Resources\lang3.js" />
+    <Content Include="Resources\lang6.js" />
+    <Content Include="Resources\lang5.js" />
+    <Content Include="Resources\_Message_audio.mp3" />
+    <Content Include="rest\api.asmx" />
+    <Content Include="RightPanel\PlayerContainer.ascx" />
+    <Content Include="RightPanel\RightContainer.ascx" />
+    <Content Include="Scripts\adminPanelScript.js" />
+    <Content Include="Scripts\ArchiveScript.js" />
+    <Content Include="Scripts\axios.min.js" />
+    <Content Include="Scripts\BlockExtViewer.js" />
+    <Content Include="Scripts\bootstrap-datepicker.js" />
+    <Content Include="Scripts\bootstrap3-typeahead.min.js" />
+    <Content Include="Scripts\CSS2DRenderer.js" />
+    <Content Include="Scripts\CSS3DRenderer.js" />
+    <Content Include="Scripts\daterangepicker.js" />
+    <Content Include="Scripts\FileUpload.js" />
+    <Content Include="PrintTemplates\PrintTemplatesDataClasses.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>PrintTemplatesDataClasses.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="handlers\GetBlockImage.ashx" />
+    <Content Include="Blocks\DataClassesMedia.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>DataClassesMedia.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="API\Programs.ashx" />
+    <Content Include="API\News.ashx" />
+    <Content Include="API\Blocks.ashx" />
+    <Content Include="API\PrompterGetPrev.ashx" />
+    <Content Include="API\PrompterGetCurr.ashx" />
+    <Content Include="API\ProgrammsListGet.ashx" />
+    <Content Include="API\NewsPlanGetGet.ashx" />
+    <Content Include="API\NewsCurGetGet.ashx" />
+    <Content Include="API\NewsPastGetGet.ashx" />
+    <Content Include="API\BlocksGet.ashx" />
+    <Content Include="API\BlocksUndelete.ashx" />
+    <Content Include="API\videoFromNewsGet.ashx" />
+    <Content Include="API\SrtFileFromMediaGet.ashx" />
+    <Content Include="AutoArchive.bat" />
+    <Content Include="API\ProgrammsListWidthRightGet.ashx" />
+    <Content Include="API\BlocksCernovik.ashx" />
+    <Content Include="API\newsUndelete.ashx" />
+    <Content Include="API\NewsList.ashx" />
+    <Content Include="API\blockToNewsAdd.ashx" />
+    <Content Include="API\CrowlFileFromMediaGet.ashx" />
+    <Content Include="API\BlocksJson.ashx" />
+    <Content Include="API\BlocksTypeJson.ashx" />
+    <None Include="Blocks\DataClassesMedia.dbml.layout">
+      <DependentUpon>DataClassesMedia.dbml</DependentUpon>
+    </None>
+    <Content Include="handlers\GetBlockVideo.ashx" />
+    <Content Include="handlers\FileUpload.ashx" />
+    <Content Include="handlers\GetMediaSourceFIle.ashx" />
+    <Content Include="handlers\ExtBlockFileUpload.ashx" />
+    <Content Include="handlers\GetMediaLRV.ashx" />
+    <Content Include="handlers\GetFile.ashx" />
+    <Content Include="handlers\Handler1.ashx" />
+    <Content Include="handlers\GetThumbnails.ashx" />
+    <Content Include="Lite.Master" />
+    <Content Include="LIte\LiteDataClasses.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>LiteDataClasses.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="handlers\UserRight.ashx" />
+    <Content Include="handlers\CasparUpload.ashx" />
+    <Content Include="API\PrompterGetNext.ashx" />
+    <Content Include="handlers\GetCaptions.ashx" />
+    <Content Include="handlers\NewsToRtf.ashx" />
+    <Content Include="handlers\NewsToText.ashx" />
+    <Content Include="handlers\NewsToXLS.ashx" />
+    <Content Include="handlers\NewsToTitleList.ashx" />
+    <Content Include="handlers\checkDB.ashx" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="handlers\SynhTemplateGet.ashx" />
+    <Content Include="handlers\NewsToWord.ashx" />
+    <Content Include="Content\manual_rus.pdf" />
+    <Content Include="fonts\vjs.woff" />
+    <Content Include="fonts\vjs.ttf" />
+    <Content Include="fonts\vjs.eot" />
+    <Content Include="handlers\exitUser.ashx" />
+    <Content Include="handlers\GetArchiveBlockImage.ashx" />
+    <Content Include="handlers\GetArchiveBlockVideo.ashx" />
+    <Content Include="handlers\fileUploadGetNewChunk.ashx" />
+    <Content Include="handlers\GetBlockChernovik.ashx" />
+    <Content Include="Content\manual_eng.pdf" />
+    <Content Include="handlers\NewsToAutoscript.ashx" />
+    <Content Include="fonts\Gotham Pro_Bold.json" />
+    <Content Include="fonts\gentilis_bold.typeface.json" />
+    <Content Include="handlers\fileUploadSimple.ashx" />
+    <Content Include="handlers\GetArchiveSourceFile.ashx" />
+    <Content Include="handlers\NewsToPrompter.ashx" />
+    <Content Include="cynegy\CynegyDataClasses.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>CynegyDataClasses.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="cynegy\CynegyDataClasses.dbml.layout">
+      <DependentUpon>CynegyDataClasses.dbml</DependentUpon>
+    </None>
+    <Content Include="handlers\fileUploadChankSimple.ashx" />
+    <Content Include="handlers\blockText.ashx" />
+    <Content Include="handlers\GetFileFromFs.ashx" />
+    <Content Include="handlers\WebSocket.ashx" />
+    <Content Include="handlers\ws.ashx" />
+    <Content Include="handlers\mobileRss.ashx" />
+    <Content Include="handlers\rssPage.ashx" />
+    <Content Include="handlers\socialImage.ashx" />
+    <Content Include="handlers\GetRssVideo.ashx" />
+    <Content Include="handlers\GetrssImg.ashx" />
+    <Content Include="handlers\GetRssSource.ashx" />
+    <None Include="LIte\LiteDataClasses.dbml.layout">
+      <DependentUpon>LiteDataClasses.dbml</DependentUpon>
+    </None>
+    <Content Include="NFSocket\NFSocketHandler.ashx" />
+    <Content Include="NFSocket\NFSocketResponce.ashx" />
+    <None Include="PrintTemplates\PrintTemplatesDataClasses.dbml.layout">
+      <DependentUpon>PrintTemplatesDataClasses.dbml</DependentUpon>
+    </None>
+    <None Include="Properties\PublishProfiles\1.pubxml" />
+    <None Include="Properties\PublishProfiles\2.pubxml" />
+    <None Include="Properties\PublishProfiles\3.pubxml" />
+    <None Include="Properties\PublishProfiles\ftp_demo.pubxml" />
+    <None Include="Properties\PublishProfiles\may24.rustv.ru.pubxml" />
+    <None Include="Properties\PublishProfiles\newsfactorymaster.pubxml" />
+    <Content Include="Scripts\jquery-2.0.1.min.js" />
+    <Content Include="Scripts\jquery-2.1.3.min.js" />
+    <Content Include="News\NewsPanel.ascx" />
+    <Content Include="News\NewsTree.ascx" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap-theme.css.map" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\css\bootstrap.css.map" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="bootstrap\bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="News\NewsData.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>NewsData.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Blocks\BlocksDataClasses1.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>BlocksDataClasses1.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Blocks\BlocksDataClasses1.dbml.layout">
+      <DependentUpon>BlocksDataClasses1.dbml</DependentUpon>
+    </None>
+    <Content Include="Images\glyphicons\.DS_Store" />
+    <None Include="News\NewsData.dbml.layout">
+      <DependentUpon>NewsData.dbml</DependentUpon>
+    </None>
+    <Content Include="Scripts\BlockEdit.js" />
+    <Content Include="Scripts\DragAndDrop.js" />
+    <Content Include="Content\jquery-ui.min.css" />
+    <Content Include="Scripts\jquery-ui.min.js" />
+    <Content Include="Scripts\jquery-ui-1.12.1.js" />
+    <Content Include="Scripts\jquery-ui-timepicker-addon.js" />
+    <Content Include="Scripts\jquery-ui-timepicker-addon.min.js" />
+    <Content Include="Scripts\jquery.cookie-1.4.1.min.js" />
+    <Content Include="Scripts\jquery.timepicker.min.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\Lenta.js" />
+    <Content Include="Scripts\LoginScript.js" />
+    <Content Include="Scripts\Messager.js" />
+    <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\News.js" />
+    <Content Include="Scripts\NewsEdit.js" />
+    <Content Include="Scripts\newsTitleScript.js" />
+    <Content Include="Scripts\NFfileUpload.js" />
+    <Content Include="Scripts\nfsocketScript.js" />
+    <Content Include="Scripts\NFW.js" />
+    <Content Include="Scripts\partnersScript.js" />
+    <Content Include="Scripts\printThis.js" />
+    <Content Include="Scripts\RssScript.js" />
+    <Content Include="Scripts\slick.min.js" />
+    <Content Include="Scripts\socialScrpt.js" />
+    <Content Include="Scripts\statPanelScript.js" />
+    <Content Include="Scripts\subtitleEditor.js" />
+    <Content Include="Scripts\three.min.js" />
+    <Content Include="Scripts\Utils.js" />
+    <Content Include="Scripts\video.js" />
+    <Content Include="Scripts\VideoPlayer.js" />
+    <Content Include="!!!social_instruction.txt" />
+    <Content Include="Scripts\vue.min.js" />
+    <Content Include="ServiceHandlers\1.xml" />
+    <Content Include="Styles\!!dbUpdate.txt" />
+    <Content Include="Styles\1024style.css" />
+    <Content Include="Styles\1260style.css" />
+    <Content Include="Styles\560style.css" />
+    <Content Include="Styles\960style.css" />
+    <Content Include="Styles\BlockEditor.css" />
+    <Content Include="Styles\custom.css" />
+    <Content Include="Styles\LiteStyle.css" />
+    <Content Include="Styles\newsEditorStyle.css" />
+    <Content Include="Styles\NFW.css" />
+    <Content Include="Styles\old.css" />
+    <Content Include="Styles\promptStyle.css" />
+    <Content Include="Styles\slick-theme.css" />
+    <Content Include="Styles\slick.css" />
+    <Content Include="Styles\test.css" />
+    <Content Include="test.html" />
+    <Content Include="testservice.asmx" />
+    <Content Include="ViewSwitcher.ascx" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="ws.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\_references.js" />
+    <Content Include="ServiceHandlers\ServiceHandler.ashx" />
+    <Content Include="ServiceHandlers\FFMpeg.ashx" />
+    <Content Include="ServiceHandlers\LRVUploadHandler.ashx" />
+    <Content Include="ServiceHandlers\ThUploadHandler.ashx" />
+    <Content Include="ServiceHandlers\getServiceConfig.ashx" />
+    <Content Include="ServiceHandlers\ListForGenerateLRV.ashx" />
+    <Content Include="ServiceHandlers\LrvAdd.ashx" />
+    <Content Include="ServiceHandlers\ListForGenerateTH.ashx" />
+    <Content Include="ServiceHandlers\THAdd.ashx" />
+    <Content Include="ServiceHandlers\ListForGenerateIMG.ashx" />
+    <Content Include="ServiceHandlers\ImgAdd.ashx" />
+    <Content Include="ServiceHandlers\ListForGenerateRSS.ashx" />
+    <Content Include="ServiceHandlers\RssAdd.ashx" />
+    <Content Include="ServiceHandlers\RssAddComplite.ashx" />
+    <Content Include="ServiceHandlers\LrvUpdateStatus.ashx" />
+    <Content Include="ServiceHandlers\getSocialConfig.ashx" />
+    <Content Include="ServiceHandlers\ListForSocialMessages.ashx" />
+    <Content Include="ServiceHandlers\postSocialPublish.ashx" />
+    <Content Include="ServiceHandlers\LrvUpdateChrono.ashx" />
+    <Content Include="ServiceHandlers\EDL.ashx" />
+    <Content Include="ServiceHandlers\LRVstarted.ashx" />
+    <Content Include="Site.Mobile.Master" />
+    <Content Include="ServiceHandlers\SessionsHandeler.ashx" />
+    <Content Include="ServiceHandlers\CountOfActiveNews.ashx" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\BlocksTypeJson.ashx.cs">
+      <DependentUpon>BlocksTypeJson.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\BlocksJson.ashx.cs">
+      <DependentUpon>BlocksJson.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\BlocksCernovik.ashx.cs">
+      <DependentUpon>BlocksCernovik.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\Blocks.ashx.cs">
+      <DependentUpon>Blocks.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\BlocksGet.ashx.cs">
+      <DependentUpon>BlocksGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\blockToNewsAdd.ashx.cs">
+      <DependentUpon>blockToNewsAdd.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\EncryptString.cs" />
+    <Compile Include="API\NewsList.ashx.cs">
+      <DependentUpon>NewsList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\newsUndelete.ashx.cs">
+      <DependentUpon>newsUndelete.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\BlocksUndelete.ashx.cs">
+      <DependentUpon>BlocksUndelete.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\News.ashx.cs">
+      <DependentUpon>News.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\NewsCurGetGet.ashx.cs">
+      <DependentUpon>NewsCurGetGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\NewsPastGetGet.ashx.cs">
+      <DependentUpon>NewsPastGetGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\NewsPlanGetGet.ashx.cs">
+      <DependentUpon>NewsPlanGetGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\ProgrammsListWidthRightGet.ashx.cs">
+      <DependentUpon>ProgrammsListWidthRightGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\ProgrammsListGet.ashx.cs">
+      <DependentUpon>ProgrammsListGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\Programs.ashx.cs">
+      <DependentUpon>Programs.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\CrowlFileFromMediaGet.ashx.cs">
+      <DependentUpon>CrowlFileFromMediaGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\SrtFileFromMediaGet.ashx.cs">
+      <DependentUpon>SrtFileFromMediaGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\videoFromNewsGet.ashx.cs">
+      <DependentUpon>videoFromNewsGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\PrompterGetCurr.ashx.cs">
+      <DependentUpon>PrompterGetCurr.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\PrompterGetPrev.ashx.cs">
+      <DependentUpon>PrompterGetPrev.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="About.aspx.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="About.aspx.designer.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="App_Start\playOut.cs" />
+    <Compile Include="App_Start\portalOut.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="BlockScript.aspx.cs">
+      <DependentUpon>BlockScript.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="BlockScript.aspx.designer.cs">
+      <DependentUpon>BlockScript.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\ArchiveBlocksConteiner.ascx.cs">
+      <DependentUpon>ArchiveBlocksConteiner.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\ArchiveBlocksConteiner.ascx.designer.cs">
+      <DependentUpon>ArchiveBlocksConteiner.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\blockDeleted.aspx.cs">
+      <DependentUpon>blockDeleted.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\blockDeleted.aspx.designer.cs">
+      <DependentUpon>blockDeleted.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\BlockEditor.aspx.cs">
+      <DependentUpon>BlockEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\BlockEditor.aspx.designer.cs">
+      <DependentUpon>BlockEditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\BlockEditorPlayer.ascx.cs">
+      <DependentUpon>BlockEditorPlayer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\BlockEditorPlayer.ascx.designer.cs">
+      <DependentUpon>BlockEditorPlayer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\BlockExtViewer.aspx.cs">
+      <DependentUpon>BlockExtViewer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\BlockExtViewer.aspx.designer.cs">
+      <DependentUpon>BlockExtViewer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\blockHistory.aspx.cs">
+      <DependentUpon>blockHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\blockHistory.aspx.designer.cs">
+      <DependentUpon>blockHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\blockInplaceEditorMenu.aspx.cs">
+      <DependentUpon>blockInplaceEditorMenu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\blockInplaceEditorMenu.aspx.designer.cs">
+      <DependentUpon>blockInplaceEditorMenu.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\BlockPanel.ascx.cs">
+      <DependentUpon>BlockPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\BlockPanel.ascx.designer.cs">
+      <DependentUpon>BlockPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\BlocksDataClasses1.cs">
+      <DependentUpon>BlocksDataClasses1.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\blockSocial.aspx.cs">
+      <DependentUpon>blockSocial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\blockSocial.aspx.designer.cs">
+      <DependentUpon>blockSocial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\DataClassesMedia.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataClassesMedia.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\ExtLinkButton.ascx.cs">
+      <DependentUpon>ExtLinkButton.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\ExtLinkButton.ascx.designer.cs">
+      <DependentUpon>ExtLinkButton.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\GetImage.aspx.cs">
+      <DependentUpon>GetImage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\GetImage.aspx.designer.cs">
+      <DependentUpon>GetImage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\LentaBlocksConteiner.ascx.cs">
+      <DependentUpon>LentaBlocksConteiner.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\LentaBlocksConteiner.ascx.designer.cs">
+      <DependentUpon>LentaBlocksConteiner.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Blocks\PartnersBlocksConteiner.ascx.cs">
+      <DependentUpon>PartnersBlocksConteiner.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Blocks\PartnersBlocksConteiner.ascx.designer.cs">
+      <DependentUpon>PartnersBlocksConteiner.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="cynegy\CynegyDataClasses.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CynegyDataClasses.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\adminForm.aspx.cs">
+      <DependentUpon>adminForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\adminForm.aspx.designer.cs">
+      <DependentUpon>adminForm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\adminPlayOutItem.aspx.cs">
+      <DependentUpon>adminPlayOutItem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\adminPlayOutItem.aspx.designer.cs">
+      <DependentUpon>adminPlayOutItem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\AlertPanel.ascx.cs">
+      <DependentUpon>AlertPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\AlertPanel.ascx.designer.cs">
+      <DependentUpon>AlertPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\BlockMediaPanel.ascx.cs">
+      <DependentUpon>BlockMediaPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\BlockMediaPanel.ascx.designer.cs">
+      <DependentUpon>BlockMediaPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\BlockNamePanel.ascx.cs">
+      <DependentUpon>BlockNamePanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\BlockNamePanel.ascx.designer.cs">
+      <DependentUpon>BlockNamePanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\MediaItem.ascx.cs">
+      <DependentUpon>MediaItem.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\MediaItem.ascx.designer.cs">
+      <DependentUpon>MediaItem.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\MediaPlayer.ascx.cs">
+      <DependentUpon>MediaPlayer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\MediaPlayer.ascx.designer.cs">
+      <DependentUpon>MediaPlayer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\SuccessPanel.ascx.cs">
+      <DependentUpon>SuccessPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\BlocksExtViewer\SuccessPanel.ascx.designer.cs">
+      <DependentUpon>SuccessPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\chernovik.aspx.cs">
+      <DependentUpon>chernovik.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\chernovik.aspx.designer.cs">
+      <DependentUpon>chernovik.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\LoginAlertPanel.ascx.cs">
+      <DependentUpon>LoginAlertPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\LoginAlertPanel.ascx.designer.cs">
+      <DependentUpon>LoginAlertPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\mainVideoPlayer.aspx.cs">
+      <DependentUpon>mainVideoPlayer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\mainVideoPlayer.aspx.designer.cs">
+      <DependentUpon>mainVideoPlayer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\mainVideoPlayerElement.aspx.cs">
+      <DependentUpon>mainVideoPlayerElement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\mainVideoPlayerElement.aspx.designer.cs">
+      <DependentUpon>mainVideoPlayerElement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\playoutTask.ascx.cs">
+      <DependentUpon>playoutTask.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\playoutTask.ascx.designer.cs">
+      <DependentUpon>playoutTask.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\playOutTasks.aspx.cs">
+      <DependentUpon>playOutTasks.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\playOutTasks.aspx.designer.cs">
+      <DependentUpon>playOutTasks.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\printTemplateEditor.aspx.cs">
+      <DependentUpon>printTemplateEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\printTemplateEditor.aspx.designer.cs">
+      <DependentUpon>printTemplateEditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\sotEditor.aspx.cs">
+      <DependentUpon>sotEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\sotEditor.aspx.designer.cs">
+      <DependentUpon>sotEditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\statForm.aspx.cs">
+      <DependentUpon>statForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\statForm.aspx.designer.cs">
+      <DependentUpon>statForm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\SubBlockImageControl.aspx.cs">
+      <DependentUpon>SubBlockImageControl.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\SubBlockImageControl.aspx.designer.cs">
+      <DependentUpon>SubBlockImageControl.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="fileUpload\CFileUpload.cs" />
+    <Compile Include="handlers\GetRssSource.ashx.cs">
+      <DependentUpon>GetRssSource.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetRssVideo.ashx.cs">
+      <DependentUpon>GetRssVideo.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetrssImg.ashx.cs">
+      <DependentUpon>GetrssImg.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\socialImage.ashx.cs">
+      <DependentUpon>socialImage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\rssPage.ashx.cs">
+      <DependentUpon>rssPage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\mobileRss.ashx.cs">
+      <DependentUpon>mobileRss.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\CasparUpload.ashx.cs">
+      <DependentUpon>CasparUpload.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\checkDB.ashx.cs">
+      <DependentUpon>checkDB.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\ExtBlockFileUpload.ashx.cs">
+      <DependentUpon>ExtBlockFileUpload.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\FileUpload.ashx.cs">
+      <DependentUpon>FileUpload.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\fileUploadGetNewChunk.ashx.cs">
+      <DependentUpon>fileUploadGetNewChunk.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\fileUploadChankSimple.ashx.cs">
+      <DependentUpon>fileUploadChankSimple.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetArchiveBlockImage.ashx.cs">
+      <DependentUpon>GetArchiveBlockImage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetArchiveBlockVideo.ashx.cs">
+      <DependentUpon>GetArchiveBlockVideo.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetBlockChernovik.ashx.cs">
+      <DependentUpon>GetBlockChernovik.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetBlockImage.ashx.cs">
+      <DependentUpon>GetBlockImage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetBlockVideo.ashx.cs">
+      <DependentUpon>GetBlockVideo.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetCaptions.ashx.cs">
+      <DependentUpon>GetCaptions.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\fileUploadSimple.ashx.cs">
+      <DependentUpon>fileUploadSimple.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\WebSocket.ashx.cs">
+      <DependentUpon>WebSocket.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetFileFromFs.ashx.cs">
+      <DependentUpon>GetFileFromFs.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetFile.ashx.cs">
+      <DependentUpon>GetFile.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetMediaLRV.ashx.cs">
+      <DependentUpon>GetMediaLRV.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetArchiveSourceFile.ashx.cs">
+      <DependentUpon>GetArchiveSourceFile.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetMediaSourceFIle.ashx.cs">
+      <DependentUpon>GetMediaSourceFIle.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\GetThumbnails.ashx.cs">
+      <DependentUpon>GetThumbnails.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="API\PrompterGetNext.ashx.cs">
+      <DependentUpon>PrompterGetNext.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToPrompter.ashx.cs">
+      <DependentUpon>NewsToPrompter.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToAutoscript.ashx.cs">
+      <DependentUpon>NewsToAutoscript.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToRtf.ashx.cs">
+      <DependentUpon>NewsToRtf.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\exitUser.ashx.cs">
+      <DependentUpon>exitUser.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToText.ashx.cs">
+      <DependentUpon>NewsToText.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\blockText.ashx.cs">
+      <DependentUpon>blockText.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToTitleList.ashx.cs">
+      <DependentUpon>NewsToTitleList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToWord.ashx.cs">
+      <DependentUpon>NewsToWord.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\NewsToXLS.ashx.cs">
+      <DependentUpon>NewsToXLS.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\SynhTemplateGet.ashx.cs">
+      <DependentUpon>SynhTemplateGet.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\UserRight.ashx.cs">
+      <DependentUpon>UserRight.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="handlers\utils.cs" />
+    <Compile Include="handlers\ws.ashx.cs">
+      <DependentUpon>ws.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Index.aspx.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Index.aspx.designer.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Lite.Master.cs">
+      <DependentUpon>Lite.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Lite.Master.designer.cs">
+      <DependentUpon>Lite.Master</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlockHead.ascx.cs">
+      <DependentUpon>BlockHead.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlockHead.ascx.designer.cs">
+      <DependentUpon>BlockHead.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlockItem.ascx.cs">
+      <DependentUpon>BlockItem.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlockItem.ascx.designer.cs">
+      <DependentUpon>BlockItem.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlocksColumn.ascx.cs">
+      <DependentUpon>BlocksColumn.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\BlocksElements\BlocksColumn.ascx.designer.cs">
+      <DependentUpon>BlocksColumn.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\LiteBlockEditor.aspx.cs">
+      <DependentUpon>LiteBlockEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\LiteBlockEditor.aspx.designer.cs">
+      <DependentUpon>LiteBlockEditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\LiteContainer.ascx.cs">
+      <DependentUpon>LiteContainer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\LiteContainer.ascx.designer.cs">
+      <DependentUpon>LiteContainer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\LiteDataClasses.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LiteDataClasses.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\NewsElements\NewsColumn.ascx.cs">
+      <DependentUpon>NewsColumn.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\NewsElements\NewsColumn.ascx.designer.cs">
+      <DependentUpon>NewsColumn.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LIte\NewsElements\NewsItem.ascx.cs">
+      <DependentUpon>NewsItem.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LIte\NewsElements\NewsItem.ascx.designer.cs">
+      <DependentUpon>NewsItem.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="MimeExtensionHelper.cs" />
+    <Compile Include="News\ArchiveNews.ascx.cs">
+      <DependentUpon>ArchiveNews.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\ArchiveNews.ascx.designer.cs">
+      <DependentUpon>ArchiveNews.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="News\LentaNews.ascx.cs">
+      <DependentUpon>LentaNews.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\LentaNews.ascx.designer.cs">
+      <DependentUpon>LentaNews.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="News\newsDeleted.aspx.cs">
+      <DependentUpon>newsDeleted.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\newsDeleted.aspx.designer.cs">
+      <DependentUpon>newsDeleted.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="News\newsToTitle.aspx.cs">
+      <DependentUpon>newsToTitle.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\newsToTitle.aspx.designer.cs">
+      <DependentUpon>newsToTitle.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="News\PartnersNews.ascx.cs">
+      <DependentUpon>PartnersNews.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\PartnersNews.ascx.designer.cs">
+      <DependentUpon>PartnersNews.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="News\rssNews.ascx.cs">
+      <DependentUpon>rssNews.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\rssNews.ascx.designer.cs">
+      <DependentUpon>rssNews.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="News\title.aspx.cs">
+      <DependentUpon>title.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\title.aspx.designer.cs">
+      <DependentUpon>title.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="NFSocket\CClient.cs" />
+    <Compile Include="NFSocket\NFSocketHandler.ashx.cs">
+      <DependentUpon>NFSocketHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="NFSocket\NFSocketResponce.ashx.cs">
+      <DependentUpon>NFSocketResponce.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintTemplates\BlockScriptClass.cs" />
+    <Compile Include="Blocks\BlocksDataClasses1.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BlocksDataClasses1.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="Contact.aspx.cs">
+      <DependentUpon>Contact.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Contact.aspx.designer.cs">
+      <DependentUpon>Contact.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\ProgramComoBox.ascx.cs">
+      <DependentUpon>ProgramComoBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Elements\ProgramComoBox.ascx.designer.cs">
+      <DependentUpon>ProgramComoBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="News\NewsData.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NewsData.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="News\NewsEditor.aspx.cs">
+      <DependentUpon>NewsEditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\NewsEditor.aspx.designer.cs">
+      <DependentUpon>NewsEditor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="News\NewsPanel.ascx.cs">
+      <DependentUpon>NewsPanel.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\NewsPanel.ascx.designer.cs">
+      <DependentUpon>NewsPanel.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="News\NewsTree.ascx.cs">
+      <DependentUpon>NewsTree.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="News\NewsTree.ascx.designer.cs">
+      <DependentUpon>NewsTree.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="PrintTemplates\PrintTemplatesDataClasses.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PrintTemplatesDataClasses.dbml</DependentUpon>
+    </Compile>
+    <Compile Include="PrintTemplates\Utils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rest\api.asmx.cs">
+      <DependentUpon>api.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RightPanel\PlayerContainer.ascx.cs">
+      <DependentUpon>PlayerContainer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RightPanel\PlayerContainer.ascx.designer.cs">
+      <DependentUpon>PlayerContainer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="RightPanel\RightContainer.ascx.cs">
+      <DependentUpon>RightContainer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RightPanel\RightContainer.ascx.designer.cs">
+      <DependentUpon>RightContainer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="RightPanel\RssNews.cs" />
+    <Compile Include="ServiceHandlers\CountOfActiveNews.ashx.cs">
+      <DependentUpon>CountOfActiveNews.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\SessionsHandeler.ashx.cs">
+      <DependentUpon>SessionsHandeler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\LRVstarted.ashx.cs">
+      <DependentUpon>LRVstarted.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\FFMpeg.ashx.cs">
+      <DependentUpon>FFMpeg.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\EDL.ashx.cs">
+      <DependentUpon>EDL.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\LrvUpdateChrono.ashx.cs">
+      <DependentUpon>LrvUpdateChrono.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\postSocialPublish.ashx.cs">
+      <DependentUpon>postSocialPublish.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\getSocialConfig.ashx.cs">
+      <DependentUpon>getSocialConfig.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ListForSocialMessages.ashx.cs">
+      <DependentUpon>ListForSocialMessages.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ListForGenerateRSS.ashx.cs">
+      <DependentUpon>ListForGenerateRSS.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ListForGenerateIMG.ashx.cs">
+      <DependentUpon>ListForGenerateIMG.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ListForGenerateTH.ashx.cs">
+      <DependentUpon>ListForGenerateTH.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ImgAdd.ashx.cs">
+      <DependentUpon>ImgAdd.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\LrvUpdateStatus.ashx.cs">
+      <DependentUpon>LrvUpdateStatus.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\RssAddComplite.ashx.cs">
+      <DependentUpon>RssAddComplite.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\RssAdd.ashx.cs">
+      <DependentUpon>RssAdd.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\THAdd.ashx.cs">
+      <DependentUpon>THAdd.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\LrvAdd.ashx.cs">
+      <DependentUpon>LrvAdd.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ListForGenerateLRV.ashx.cs">
+      <DependentUpon>ListForGenerateLRV.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\getServiceConfig.ashx.cs">
+      <DependentUpon>getServiceConfig.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\LRVUploadHandler.ashx.cs">
+      <DependentUpon>LRVUploadHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ServiceHandler.ashx.cs">
+      <DependentUpon>ServiceHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceHandlers\ThUploadHandler.ashx.cs">
+      <DependentUpon>ThUploadHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Site.Mobile.Master.cs">
+      <DependentUpon>Site.Mobile.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Mobile.Master.designer.cs">
+      <DependentUpon>Site.Mobile.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="testservice.asmx.cs">
+      <DependentUpon>testservice.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ViewSwitcher.ascx.cs">
+      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ViewSwitcher.ascx.designer.cs">
+      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="ws.ashx.cs">
+      <DependentUpon>ws.ashx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Site.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="LCC11">
+      <Guid>{EDCD5812-6A06-43C3-AFAC-46EF5D14E22C}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>64711</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:64711/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <UserProperties bootstrap_4bootstrap-3_13_12-dist_4css_4bootstrap_1css_1map__JSONSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

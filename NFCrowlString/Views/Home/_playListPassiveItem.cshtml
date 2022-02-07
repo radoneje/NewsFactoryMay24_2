@@ -1,0 +1,43 @@
+﻿@model NFCrowlString.tSTR_item
+
+
+<div class="playListItem  passiveItem newItem" id="@Model.id" >
+    
+    <div class="passiveDownBtnWr" onclick="passiveItemActivate('@Model.id')">
+        <div class="passiveUpBtn"></div>
+    </div>
+    @Ajax.ActionLink("удалить",
+                 "PassiveItemDelete",
+        new { itemId = Model.id },
+        new AjaxOptions { HttpMethod = "POST", OnBegin = "$('.strPassiveBox').find('#" + Model.id + "').addClass('forRemove')", OnSuccess = "$('.strPassiveBox').find('#" + Model.id + "').slowRemove(); " },
+                new { @class = "ActiveItemToPassiveBtn", @id = "PassiveItemDelete" + Model.id })
+    <div class="passiveTextWr">
+        <div class="activeText"  onclick="if($(this).find('.activeTextEditor').length==0)changeItemText('@Model.id')">
+            @Model.text
+        </div>
+        <div class="activeData passiveData">
+            add: @Model.dateAdd.ToString("dd.MM.yyyy HH:mm"), edit: @Model.dateModify.ToString("dd.MM.yyyy HH:mm")
+        </div>
+        <div class="passiveTimerWr">
+        </div>
+        
+            <div class="passiveControl">
+                <div class="passiveStopBtnWr" itemid="@Model.id" onclick="var id='#'+ 'PassiveItemDelete'+'@Model.id';$(id).click();">
+                    <div class="passiveStopBtn"></div>
+                </div>
+                <div class="passiveControlBtnWr"><div class="passiveControlBtnTimer passiveControlBtnTimerState_@NFCrowlString.Models.Ctimer.getPassiveTimerStatus(Model.id)" onclick="passiveTimerLoad('@Model.id')"></div></div>
+
+                <div class="passiveControlBtnWr"><div class="passiveControlBtnCopy" onclick="playlistItemClone('@Model.id')"></div></div>
+                <div style="clear:both"></div>
+            </div>
+        </div>
+
+    
+
+
+    <div style="clear:both"></div>
+</div>
+<script>
+    setTimeout(function () { $("#@Model.id").removeClass("newItem") }, 1000);
+</script>
+

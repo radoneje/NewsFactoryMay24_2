@@ -1,0 +1,272 @@
+﻿
+$(document).ready(function() {
+    adminPassSetBorderToDefault();
+    adminReadRateSetBorderToDefault();
+    socialInit();
+    rssInit();
+});
+
+function adminPassSetBorderToDefault()
+{
+    $("#adminNewPass1").change(function () {
+        $("#adminNewPass1").removeClass(controlError);
+        $("#adminNewPass2").removeClass(controlError);
+    });
+    $("#adminNewPass2").change(function () {
+        $("#adminNewPass1").removeClass(controlError);
+        $("#adminNewPass2").removeClass(controlError);
+    });
+    $("#adminOldPass").change(function () {
+        $("#adminOldPass").removeClass(controlError);
+    });
+}
+function adminReadRateSetBorderToDefault() {
+    $("#adminReadSpeed").change(function () {
+        $("#adminReadSpeed").css("border-bottom", "");
+    }); 
+}
+
+function adminPasswordChange() {
+    if($("#adminNewPass1").val()!=$("#adminNewPass2").val() ||$("#adminNewPass1").val().length==0 )
+    {
+        $("#adminNewPass1").css("border-bottom", "1px solid red");
+        $("#adminNewPass2").css("border-bottom", "1px solid red");
+        return;
+    }
+    if ($("#adminOldPass").val().length == 0) {
+        $("#adminOldPass").css("border-bottom", "1px solid red");
+        return;
+    }
+    var dt = $("#adminPassChageForm").getFormData();
+    try{
+        sendFormDataToService(dt.serviceName, dt.params, function (data) {
+          
+            $("#adminPassChageForm").flipBackground(JSON.parse(data.d).status>0?"green":"red");
+        });
+    }
+    catch (ex) {
+        $("#adminPassChageForm").flipBackground("red");
+        console.warn(error);
+        console.warn(ex);
+    }
+}
+function adminReadRateChange()
+{
+    if ($("#adminReadSpeed").val().length == 0) {
+        $("#adminReadSpeed").val();
+        $("#adminReadSpeed").addClass("controlError");
+        return;
+    }
+    var rr;
+    try{
+        rr= parseInt($("#adminReadSpeed").val());
+    }
+    catch (ex) {
+        $("#adminReadSpeed").val();
+        $("#adminReadSpeed").addClass("controlError");
+        return;
+    }
+    if(rr<3 || rr>30)
+    {
+        $("#adminReadSpeed").val();
+        $("#adminReadSpeed").css("border-bottom", "1px solid red");
+        return;
+    }
+
+    var dt = $("#adminReadRateChageForm").getFormData();
+        sendFormDataToService(dt.serviceName, dt.params, function (data) {
+          
+            $("#adminReadRateChageForm").flipBackground(JSON.parse(data.d).status>0?"green":"red");
+        });
+
+}
+function addSocial()
+{
+    $.ajax({
+        type: "POST",
+        contentType: "application/json;",
+        url: serverRoot+ "testservice.asmx/socialAdd",
+        data: JSON.stringify({ id: 0 }),
+        dataType: "json",
+        async: true,
+        success: function (data) {
+            APreloadSocial(JSON.parse(data.d));
+        },
+        error: function (data) {
+            console.warn("/testservice.asmx/socialAdd error");
+            console.warn(data);
+        }
+
+    })
+}
+function APreloadSocial(data)
+{
+    $(".socialBox").html("");
+    data.feeds.forEach(function (item) {
+        APsocialFeedAdd(item, data.types);
+    });
+    return;
+}
+function       APsocialFeedAdd(item, types)
+{
+    
+    $(".socialBox").append(
+        $(div)
+        .attr("id", item.id)
+        .addClass("socialItem")
+        .append(socialItemTypeadd(item.typeId, types, item.id))
+        .append(
+            $("<input type='text' onblur='socialItemChange(\""+item.id+"\")'/>")
+            .attr("placeholder", langTable['CapName'])
+            .attr("name","title")
+            .val(item.title)
+
+            .addClass("socialItemText")
+        )
+        .append(
+            $("<input type='text' onblur='socialItemChange(\"" + item.id + "\")'/>")
+            .attr("placeholder", "auth Key")
+            .attr("name", "authKey")
+            .val(item.authKey)
+           
+            .addClass("socialItemText")
+        )
+        .append(
+         $("<input type='button' class='btn btn-danger btn-xs socialItemBtn' onclick=' deleteSocial(\""+item.id+"\")'/>")
+         .val(langTable['CapDelete'])
+        )
+        );
+}
+function socialItemTypeadd(typeId, types, id){
+
+    var ret = $("<select class='socialItemSelect' onchange='socialItemChange(\"" + id + "\")'/>")
+    types.forEach(function (tp) {
+        var itm = $("<option></option>");
+        itm.html(tp.title);
+        itm.attr("value", tp.id);
+        if (typeId == tp.id)
+            itm.prop("selected", true);
+        ret.append(itm);
+    })
+    ret.change(socialItemChange(id))
+    return ret;
+}
+function deleteSocial(id)
+{
+    $.ajax({
+        type: "POST",
+        contentType: "application/json;",
+        url: serverRoot+"/testservice.asmx/socialDelete",
+        data: JSON.stringify({ id: id }),
+        dataType: "json",
+        async: true,
+        success: function (data) {
+            APreloadSocial(JSON.parse(data.d));
+        },
+        error: function (data) {
+            console.warn("/testservice.asmx/socialDelete error");
+            console.warn(data);
+        }
+
+    })
+}
+function socialItemChange(id)
+{
+    
+    if ($("#" + id).length==0)
+        return;
+    $.ajax({
+        type: "POST",
+        contentType: "application/json;",
+        url: serverRoot+ "testservice.asmx/socialItemChange",
+        data: JSON.stringify({ id: id, title: $("#" + id + " input[name='title']").val(), typeId: $("#" + id + " select").val(), authKey: $("#" + id + " input[name='authKey']").val() }),
+        dataType: "json",
+        async: true,
+        success: function (data) {
+           // relaodSocial(JSON.parse(data.d));
+        },
+        error: function (data) {
+            console.warn("/testservice.asmx/socialItemChange error");
+            console.warn(data);
+        }
+
+    })
+}
+function socialInit()
+{
+    $.ajax({
+        type: "POST",
+        contentType: "application/json;",
+        url: serverRoot+"testservice.asmx/socialInit",
+        data: JSON.stringify({ id: 0 }),
+        dataType: "json",
+        async: true,
+        success: function (data) {
+             APreloadSocial(JSON.parse(data.d));
+        },
+        error: function (data) {
+            console.warn("/testservice.asmx/socialInit error");
+            console.warn(data);
+        }
+
+    })
+}
+function rssInit() {
+    $('#collapse4').on('hidden.bs.collapse', function () {
+        $(".rssBox").html("");
+    })
+    $('#collapse4').on('show.bs.collapse', function () {
+        $.ajax({
+            type: "POST",
+            contentType: "application/json;",
+            url: serverRoot + "testservice.asmx/rssInit",
+            data: JSON.stringify({ id: 0 }),
+            dataType: "json",
+            async: true,
+            success: function (data) {
+                console.log(data);
+                APreloadRss(JSON.parse(data.d));
+            },
+            error: function (data) {
+                console.warn("/testservice.asmx/rssInit error");
+                console.warn(data);
+            }
+
+        })
+    })
+}
+function APreloadRss(data)
+{
+   
+        $(".rssBox").html("");
+        data.forEach(function (item) {
+            APrssFeedAdd(item, data.types);
+        });
+        return;
+}
+function APsocialFeedAdd(item, types) {
+
+    $(".rssBox").append(
+        $(div)
+        .attr("id", "APrss"+item.id)
+        .addClass("socialItem")
+        .append(
+            $("<input type='text' onblur='rssItemChange(\"" + item.id + "\")'/>")
+            .attr("placeholder", langTable['CapName'])
+            .attr("name", "name")
+            .val(item.name)
+            .addClass("socialItemText")
+        )
+        .append(
+         $("<input type='button' class='btn btn-danger btn-xs socialItemBtn' onclick=' deleteRss(\"" + item.id + "\")'/>")
+         .val(langTable['CapDelete'])
+        )
+        );
+}
+function rssItemChange(id)
+{
+
+}
+function deleteRss(id)
+{
+}

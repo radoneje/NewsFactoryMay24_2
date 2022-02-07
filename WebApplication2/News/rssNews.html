@@ -1,0 +1,101 @@
+﻿<div id="rssApp" class="CenralTower" style="display:block">
+    <div class="adminForm">
+    <div v-for="item in rss" class="panel panel-default" :id="item.id">
+        <div class="panel-heading">
+           
+            <input v-model="item.title" placeholder="title" class="form-control" v-on:change="rssChange(item)" />
+        </div>
+        <div class="panel-body">
+            <div style="display:flex">
+                <div :id="'rssImg'+item.id" class="rssImg" :style="{backgroundImage:'url(/handlers/GetRssImg.ashx?MediaId='+item.id+'&rnd'+rnd+')'}">
+                    <input type="button" class="btn btn-success btn-xs" value="Изменить" style="position:absolute;bottom:0"  v-on:click="changeImg(item)"/>
+                </div>
+                <video  controls width="120" height="68" :src="'/handlers/GetRssVideo.ashx?MediaId='+item.id" :poster="'/handlers/GetRssImg.ashx?MediaId='+item.id+'&rnd'+rnd"></video>
+                <div style="width: calc(100% - 240px);">
+                    <input v-model="item.subTitle" placeholder="lid" class="form-control" v-on:change="rssChange(item)"/>
+                    <textarea v-model="item.message" placeholder="text" class="form-control" style="height: 12em; resize:none" v-on:change="rssChange(item)">
+
+                    </textarea>
+                </div>
+            </div>
+            <input type="button" class="btn btn-danger mt-3" value="Удалить" style="float:right; margin-top:4px" v-on:click="rssDelete(item)"/>
+        </div>
+    </div>
+</div>
+</div>
+<script src="/Scripts/vue.min.js"></script>
+<script src="/Scripts/axios.min.js"></script>
+<script>
+    var rssApp = new Vue({
+        el: "#rssApp",
+        data: {
+            rss: [],
+            rnd:Math.random()
+        },
+        methods: {
+            changeImg: async function (item) {
+                var _this = this;
+                var el = document.createElement("input");
+                el.type = "file";
+                el.id="rssFileUpload"
+                el.accept = "image/png, image/jpeg";
+                el.style.display="none"
+                document.body.appendChild(el);
+                $("#rssFileUpload").change(async (e) => {
+                   
+                    var file = e.target.files[0]
+                    //$("#rssImg" + item.id).attr("src", URL.createObjectURL(file))
+                   
+                    var reader = new FileReader();
+                    
+                    reader.onloadend =async  function () {
+                        var ret = (await axios.post(serverRoot + "testservice.asmx/socialMessagePublishUploadImage", {
+                            fn: file.name,
+                            base64: reader.result.replace("data:image/jpeg;base64,", "").replace("data:image/png;base64,", "")
+                        })).data;
+                        item.img = ret.d;
+                        await axios.post(serverRoot + "testservice.asmx/socialMessageImageUpdate", {
+                            id: item.id,
+                            imgFile: ret.d
+                        })
+                        await _this.rssChange(item);
+                        $("#rssFileUpload").remove();
+                        _this.rnd = Math.random();
+                    }
+                    reader.readAsDataURL(file);
+
+                   
+                })
+                $("#rssFileUpload").click()
+
+            },
+            rssChange: async function (item) {
+              
+                await axios.post(serverRoot + "testservice.asmx/rssChange", { message:JSON.stringify( item) ,id:item.id});
+            },
+            rssDelete: async function (item) {
+                if (confirm("Вы действительно хотите удалить?")) {
+                    $("#" + item.id).fadeOut(() => { /*this.rss = this.rss.filter((el) => { return el.id != item.id })*/ });
+                    await axios.post(serverRoot + "testservice.asmx/rssDeleteItem", { message: JSON.stringify(item), id: item.id });
+                }
+            },
+        },
+        mounted: async function(){
+            console.log("vue ready");
+            var data = (await axios.get(serverRoot + "rss")).data;
+            var xmlDoc=$.parseXML(data)
+            var $xml = $(xmlDoc)
+            var $items = $xml.find("item");
+            $items.each(async (i, item) => {
+                var guid = $(item).find("guid")[0].textContent
+                var data = (await axios.get(serverRoot + "handlers/GetRssSource.ashx?mediaId="+guid)).data;
+                data.id = guid;
+                this.rss.push(data);
+                console.log(data);
+            })
+            
+
+               
+        }
+    })
+</script>

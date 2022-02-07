@@ -1,0 +1,534 @@
+﻿function initBloks()
+{
+    try{
+        document.getElementById("bpNewsName").innerHTML = '<h4><div class="alert alert-success" role="alert">Для начала работы выберите выпуск.</div><h4>';
+        document.getElementById("bpNewsOwner").innerHTML = "&nbsp;";
+        document.getElementById("bpNewsDate").innerHTML = "&nbsp;";
+        document.getElementById("bpNewsDuration").innerHTML = "&nbsp; ";
+        document.getElementById("bpNewsChrono").innerHTML = "&nbsp; ";
+        document.getElementById("bpNewsChronoPlanned").innerHTML = "&nbsp;";
+        document.getElementById("bpNewsChronoCalculated").innerHTML = "&nbsp;";
+    }
+    catch(ex)
+    {
+
+    }
+}
+function ClickNews(id, GroupId) {
+    
+    document.getElementById("BlocksTable").rows[0].setAttribute("id", id);
+    document.getElementById("BlocksTable").rows[0].setAttribute("GroupId", GroupId);
+    var serviceURL = "testservice.asmx/GetBlocksFromNews";
+    if (GroupId > 0)
+    {
+        
+        serviceURL = "testservice.asmx/GetBlocksFromCopyNews"
+    }
+    var jd = {  version: 1, serv: 2, msg: 3 };
+     $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: serviceURL,
+        data: "{sNewsId:'" + id + "'}",
+        dataType: "json",
+        success: GetBlocksFromNewsSuccess,
+        error: AjaxFailed
+     }).getAllResponseHeaders();
+     
+}
+
+var ExtendedId= new Array();
+var BlockTableRowsCount;// количество заполненных строк в таблице
+function GetBlocksFromNewsSuccess(data)
+{
+    //console.log("CGetBlocksFromNewsSuccess");
+    if (!(typeof JSON.parse(data.d).NewsName === "undefined")) {
+        
+        document.getElementById("bpNewsName").innerHTML = (JSON.parse(data.d).NewsName);
+        document.getElementById("bpNewsOwner").innerHTML = "выпускающий: " + (JSON.parse(data.d).NewsOwner);
+        document.getElementById("bpNewsDate").innerHTML = "дата: " + (JSON.parse(data.d).NewsDate);
+        document.getElementById("bpNewsDuration").innerHTML = "продолжительность: " + (JSON.parse(data.d).NewsDuration);
+        document.getElementById("bpNewsChrono").innerHTML = "хронометраж: " + (JSON.parse(data.d).NewsChrono);
+        document.getElementById("bpNewsChronoPlanned").innerHTML = "планируемый: " + (JSON.parse(data.d).NewsChronoPlanned);
+        document.getElementById("bpNewsChronoCalculated").innerHTML = "рассчетный: " + (JSON.parse(data.d).NewsChronoCalculated);
+
+        ExtendedId = [];
+        for (var i = 1; i < document.getElementById("BlocksTable").getElementsByTagName("tr").length; i++) {
+            var row = document.getElementById("BlocksTable").getElementsByTagName("tr")[i];
+            var rowId = row.getAttribute('id');
+            if (rowId.indexOf("CellBlockName") >= 0) {
+
+                ExtendedId.push({ id: rowId.replace("CellBlockName", "").replace("Extrow", ""), RowH: row.offsetHeight, content: row.cells[0].innerHTML })
+            }
+        }
+
+
+        BlockTableRowsCount = 1;
+        if (!(typeof JSON.parse(data.d).NewsBlocks == "undefined"))
+            JSON.parse(data.d).NewsBlocks.forEach(AddBlocksRow);
+
+        // удаляем пустые строки
+        if (BlockTableRowsCount < document.getElementById("BlocksTable").getElementsByTagName("tr").length) {
+            for (var i = BlockTableRowsCount; i < document.getElementById("BlocksTable").getElementsByTagName("tr").length; i++) {
+                document.getElementById("BlocksTable").deleteRow(i);
+                // rowCount--;
+                i--;
+            }
+        }
+        
+    }
+   
+
+}
+function AddBlocksRow(RowData)
+{    
+    var table = document.getElementById("BlocksTable");
+    var row;
+    if (BlockTableRowsCount < table.getElementsByTagName("tr").length)
+    {
+        row = table.getElementsByTagName("tr")[BlockTableRowsCount];
+    } else
+    {
+        row = table.insertRow(table.rows.length);
+    }
+    BlockTableRowsCount++;
+   row.setAttribute("id", RowData.Id + "BaseRowBlockId");
+    row.style.cursor = "pointer";
+    var newcell;
+    if (0 < row.cells.length) { newcell = row.cells[0]; newcell.colSpan = 1; }
+    else { newcell = row.insertCell(0); }
+    
+    newcell.setAttribute("id", "CellBlockName" + RowData.Id);
+
+    newcell.innerHTML = GetBlockImage(RowData.Ready, RowData.Approve, RowData.Id) + RowData.Name;
+    newcell.onclick = function () { ClickBlockCell("CellBlockName" + RowData.Id, RowData.Id); };
+    newcell.setAttribute("class", "DragingBlocks");
+    InitBlocksDrag("CellBlockName" + RowData.Id);
+    InitBlocksDrop("CellBlockName" + RowData.Id);
+
+    if (1 < row.cells.length) { newcell = row.cells[1]; }
+    else { newcell = row.insertCell(1); }
+    newcell.innerHTML = RowData.TypeName;
+
+    if (2 < row.cells.length) { newcell = row.cells[2]; }
+    else { newcell = row.insertCell(2); } 
+     if ((checktimeFromText(RowData.BlockTime) > checktimeFromText(RowData.TaskTime)) && checktimeFromText(RowData.TaskTime )> 0)
+    {
+         newcell.innerHTML = "<p class='text-info'>" +  RowData.BlockTime +  "</p>";
+     }
+     else {
+         newcell.innerHTML = "<p class='text-muted'>" +   RowData.BlockTime + "</p>";
+
+     }
+
+    if (3 < row.cells.length) { newcell = row.cells[3]; }
+    else { newcell = row.insertCell(3); }
+    newcell.innerHTML = "<p class='text-muted'>" + RowData.TaskTime +  "</p>";
+   // newcell.innerHTML = RowData.TaskTime;
+
+    if (4 < row.cells.length) { newcell = row.cells[4]; }
+    else { newcell = row.insertCell(4); }
+    newcell.innerHTML = "";//RowData.CalcTime;
+
+    if (5 < row.cells.length) { newcell = row.cells[5]; }
+    else { newcell = row.insertCell(5); }
+    newcell.innerHTML = RowData.LookedUserName;
+
+    if (RowData.LookedUserName.length > 1)
+    {
+        row.style.backgroundColor = "#fceeee";
+    }
+    else
+    {
+            try{
+                if (RowData.CreatorId == CurrentUserId.value) {
+                    row.style.backgroundColor = "#eeffee";
+                }
+                else {
+                    row.style.backgroundColor = "white";
+                }
+            }
+            catch(ex)
+            {
+                row.style.backgroundColor = "white";
+            }        
+    }
+
+
+    ///// добавляем открытые блоки
+    if (ExtendedId.length > 0) {
+        
+        for(var i=0; i<ExtendedId.length;i++)
+        {
+            for (var i = 0; i < ExtendedId.length; i++)
+            {
+                if(ExtendedId[i].id ==RowData.Id)
+                {
+                    AddExtraRow(row, ExtendedId[i].RowH, ExtendedId[i].content);
+                    BlockTableRowsCount++;
+                   
+                }
+            }   
+        }
+        
+    }
+    ///////добавляем открытые блоки
+ }
+
+function GetBlockImage(Ready, Approve, BlockId)
+{
+    var image="red_list.png";
+    if (Ready == true) {
+        image = "yellow_list.png";
+    }
+    if (Approve == true)
+    {
+        image = "yellow_list.png";
+    }
+    if (Approve == true && Ready == true)
+        image = "green_list.png";
+
+    return "<img src='Images/" + image + "' width='25px' onclick='OpenBlockScript(" + BlockId + ")'/>&nbsp;&nbsp;";
+}
+function OpenBlockScript(BlockId, TemplateId)
+{
+    if (checkDef(TemplateId))
+    {
+        BlockId = BlockId + "&TemplateId=" + TemplateId;
+    }
+    window.open('BlockScript.aspx?BlockId=' + BlockId, '_blank', 'width=' + window.screen.availWidth / 2 + ',height=' + window.screen.availHeight / 2 + ',resizable=1');
+}
+function ClickBlockCell(CellBlockId, BlockId)
+{
+    var cell = document.getElementById(CellBlockId);
+
+    if (document.getElementById(CellBlockId + "Extrow"))
+    {
+      
+        var parent = document.getElementById(CellBlockId + "Extrow").parentNode;
+        parent.removeChild(document.getElementById(CellBlockId + "Extrow"));
+        return;
+    }
+    var Parentrow = cell.parentNode;
+    AddExtraRow(Parentrow);
+
+}
+function AddExtraRow(Parentrow, RowН, OldContent)
+{
+    var BlockId = Parentrow.getAttribute("id");
+    BlockId = BlockId.replace("BaseRowBlockId", "");
+    var PArentTable = Parentrow.parentNode;
+    var row = PArentTable.insertRow(Parentrow.rowIndex+1);
+    row.setAttribute("id", "CellBlockName" + BlockId + "Extrow");
+    var newcell = row.insertCell(0);
+    if (!(typeof RowН === "undefined"))
+    {
+        newcell.style.height = RowН;
+    }
+    if (!(typeof OldContent === "undefined")) {
+        newcell.innerHTML = OldContent;
+    }
+    else {
+        newcell.innerHTML = "подождите, загружаю";}
+
+    newcell.setAttribute("id", "CellBlockNameEx" + BlockId);
+    
+    newcell.colSpan = 6;
+
+
+    var jd = { version: 1, serv: 2, msg: 3 };
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "testservice.asmx/GetBlockDataEx",
+        data: "{sBlockId:'" + BlockId + "'}",
+        dataType: "json",
+        success: BlockDataExReceived,
+        error: AjaxFailed
+    }).getAllResponseHeaders();
+}
+function BlockDataExReceived(data)
+{
+    var elem= document.getElementById("CellBlockNameEx" + JSON.parse(data.d).Id);
+    elem.innerHTML = "<i>Автор:</i> " + (JSON.parse(data.d).Creator) + "  " +
+        "<i>Оператор:</i> " + (JSON.parse(data.d).Operator) + "  " +
+        "<i>Ведущий:</i> " + (JSON.parse(data.d).Jockey) + " <br><br><div style=\"cursor:pointer;\" onclick=\"EditBlock('"+JSON.parse(data.d).Id+"')\">" +
+        JSON.parse(data.d).Text + "</div><br>" + CreateBlockExButtons(JSON.parse(data.d).Id);
+
+}
+function CreateBlockExButtons(sBlockId)
+{
+   
+    var ret = "\
+    <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"...\">\
+  <button type=\"button\" class=\"btn btn-default\" onclick=\"EditBlock(" + sBlockId + ");\">Изменить</button>\
+ "+GenerateBlockScriptButtons(sBlockId)+" \
+  <div class=\"btn-group btn-group-xs\" role=\"group\">\
+    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-expanded=\"false\">\
+      Действия\
+      <span class=\"caret\"></span>\
+    </button>\
+    <ul class=\"dropdown-menu\" role=\"menu\">\
+      <li><a onclick=\"DeleteBlock(" + sBlockId + ", 1)\">Удалить</a></li>\
+      <li><a href=\"#\">Постоянная ссылка</a></li>\
+       <li><a onclick=\"AddBlocks(" + sBlockId + ")\">Новый блок ниже</a></li>\
+    </ul>\
+  </div>\
+</div>";
+    return ret;
+}
+function EditBlock(sBlockId) {
+
+   
+    var iDiv = CreateFullScreenDiv("FullScreenDiv");
+
+    iDiv.innerHTML = CreateBlockEditorElements();
+
+    var iframe = document.createElement('iframe');
+    iframe.src = 'blocks/BlockEditor.aspx?BlockId=' + sBlockId;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.id = "BlockEditIframe";
+    document.getElementById("FullScreenDiv").appendChild(iframe);
+    window.scrollTo(0, 0);
+}
+   
+function CreateBlockEditorElements()
+{
+    var ret;
+    return "";
+    ret = ' <div  class="panel-heading"> <div class="row">\
+        <div id="BlockEditIframe" style="width:300px; margin:0 auto;"></div>\
+';
+
+    ret =ret+ "\
+<div class=\"btn-group btn-group-sm\" role=\"group\" aria-label=\"...\">\
+<button type='button' class='btn btn-success navbar-btn' onclick='EditorSaveAll();'>Сохранить </button>\
+<button type='button' class='btn btn-warning navbar-btn' onclick='CloseEditor();'>Закрыть редактор блока </button>\
+</div></div>\
+";
+    return ret;
+}
+function AddBlockEditorTypes()
+{
+   return ' <div class="dropdown">\
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">\
+    ТИП БЛОКА\
+    <span class="caret"></span>\
+  </button>\
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">\
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>\
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>\
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>\
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>\
+  </ul>\
+</div>';
+}
+function EditorSaveAll()
+{
+    alert("здесь будет сохранение");
+}
+
+function CloseBlockEditor()
+{
+    
+    if (document.getElementById('FullScreenDiv')) {
+        
+        var parent = document.getElementById("FullScreenDiv").parentNode;
+        parent.removeChild(document.getElementById("FullScreenDiv"));
+        
+
+        var jdata = {
+            Cookie: getCookie("NFWSession"),
+            NewsId: ""
+        };
+       $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "testservice.asmx/UnlookBlock",
+            data: JSON.stringify(jdata, null, 2),
+            dataType: "json",
+            async: true,
+            failed: AjaxFailed,
+        }).getAllResponseHeaders();
+
+        
+        return;
+    }
+
+}
+function AjaxFailed(data)
+{
+    showWarning("запрос не выполнен!");
+    console.error("AjaxFailed");
+}
+setTimeout(Ticker, 20000);
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) {
+                c_end = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(c_start, c_end));
+        }
+    }
+    return "";
+}
+function Ticker()
+{
+    PingServer();
+    setTimeout(Ticker, 5000);
+}
+function PingServer() {
+
+    if (!document.getElementById("BlocksTable"))
+    {
+        setTimeout(PingServer, 1000);
+        console.warn("page not ready, walting 1 second");
+        return;
+    }
+    var Cookie = getCookie("NFWSession");
+    
+    var jdata = {
+        Cookie: Cookie,
+        NewsId: document.getElementById("BlocksTable").rows[0].getAttribute("id"),
+        NewsGroupId: document.getElementById("BlocksTable").rows[0].getAttribute("GroupId")
+    }
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "testservice.asmx/Ping",
+        data: JSON.stringify(jdata, null, 2),
+        dataType: "json",
+        async: true,
+        success: PingSucceeded,
+        error: PingFailed
+    }).getAllResponseHeaders();
+
+    
+}
+function PingSucceeded(data) {
+    console.log("PingSucceeded NFWSession=", JSON.parse(data.d).Cookie);
+    document.cookie = "NFWSession=" + JSON.parse(data.d).Cookie;
+    DefaultPageFooter.innerHTML = '<div  style="cursor:pointer" onclick="exitUser()" class="panel panel-default">\
+  <div class="panel-body">' + JSON.parse(data.d).Message + '</div></div>';
+    GetBlocksFromNewsSuccess({ d: JSON.parse(data.d).NewsData });
+}
+function PingFailed() {
+    console.log("ping failed");
+    showWarning("Нет связи с сервером!");
+    DefaultPageFooter.innerHTML = '<div class="panel panel-default">\
+  <div class="panel-danger">' + "Нет связи с сервером!" + '</div></div>';
+}
+function exitUser() {
+    if (confirm("Вы действительно хотите выйти?")) {
+        document.cookie = "NFWSession=0";
+        window.location.href = "login.aspx";
+    }
+}
+function hideControl(control)
+{
+    setTimeout(function () {
+        $("#" + control.id).hide('blind', {}, 500)
+    }, 5000);
+}
+
+function showWarning( text) {
+    $("#GlobalAlert").toggleClass("alert alert-warning").css("display", "show").text(text).show();
+    setTimeout(function () {
+        $("#GlobalAlert").hide('blind', {}, 500)
+    }, 5000);
+}
+function ShowAlert(text) {
+    $("#GlobalAlert").css("display", "show").text(text).show();
+    setTimeout(function () {
+        $("#GlobalAlert").hide('blind', {}, 500)
+    }, 5000);
+}
+
+function DeleteBlock(sBlockId)
+{
+    var Cookie = getCookie("NFWSession");
+    var jdata = {
+        Cookie: Cookie,
+        NewsId: sBlockId,
+        NewsGroupId: 0
+    }
+    $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "testservice.asmx/DeleteBlock",
+        data: JSON.stringify(jdata, null, 2),
+        dataType: "json",
+        async: true,
+        success: DeleteBlockSucceeded,
+        error: AjaxFailed
+    }).getAllResponseHeaders();
+}
+function DeleteBlockSucceeded(data)
+{
+    PingServer();
+    ShowAlert("Блок удален!");
+}
+
+
+function AddBlocks(AfterBlockId)
+{
+    if (!checkDef(AfterBlockId))
+        AfterBlockId = 0;
+
+    
+        var NewsId = document.getElementById("BlocksTable").rows[0].getAttribute("id");
+        console.log(NewsId);
+      
+   if(NewsId==null)
+    {
+       showWarning("для добавления блока нужно выбрать выпуск.");
+       return 0;
+    }
+
+        var Cookie = getCookie("NFWSession");
+        var jdata = {
+            Cookie: Cookie,
+            NewsId: NewsId,
+            NewsGroupId: AfterBlockId
+        }
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "testservice.asmx/AddBlock",
+            data: JSON.stringify(jdata, null, 2),
+            dataType: "json",
+            async: true,
+            success: AddBlocksSucceeded,
+            error: AjaxFailed
+        }).getAllResponseHeaders();
+    }
+    function AddBlocksSucceeded(data)
+    {
+        if (!(typeof JSON.parse(data.d).NewsId === "undefined"))
+            EditBlock(JSON.parse(data.d).NewsId, 0);
+        else
+        {
+            ShowWarning("При добавлении блока произошла ошибка")
+        }
+    }
+/*
+var jdata = {
+                BlockTypeId: BlockEditTypeDropDown.value,
+                BlockName: BlockEditNameTextBox.value,
+            };
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "../testservice.asmx/SaveBlock",
+                data: JSON.stringify(jdata, null, 2),
+                dataType: "json",
+                async :true,
+                success: AjaxSucceeded,
+                error: AjaxFailed
+            }).getAllResponseHeaders();
+*/

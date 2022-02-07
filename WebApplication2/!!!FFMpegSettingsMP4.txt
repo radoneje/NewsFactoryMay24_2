@@ -1,0 +1,274 @@
+﻿-vcodec libx264 -vprofile high -preset slow -b:v 700k -maxrate 700k -bufsize 1400k -s 640x360  -acodec libvo_aacenc -b:a 128k  -y -movflags frag_keyframe+empty_moov
+
+
+C:\Windows\system32>C:\ffmpeg\ffmpeg.exe -seekable 0 -i http://localhost:64711/Media/File/f61f3d915e048ea8560daed575323795/Get -vcodec libx264 -vprofile high -preset slow -b:v 500k -maxrate 500k -bufsize 1000k -s 480x360  -acodec libvo_aacenc -b:a 128k -movflags faststart -y c:/tmp/2.mp4
+-movflags frag_keyframe+empty_moov  
+
+
+C:\ffmpeg\ffmpeg.exe -i -vcodec libx264 -vprofile high -preset slow -b:v 500k -maxrate 500k -bufsize 1000k -s 480x360  -acodec libvo_aacenc -b:a 128k -movflags faststart -y -movflags frag_keyframe+empty_moov
+
+
+-vcodec libx264 -vprofile high -preset slow -b:v 500k -maxrate 500k -bufsize 1000k -vf -s 480x360 -acodec libvo_aacenc -b:a 128k 
+
+ffmpeg -i input_file.avi -vcodec libx264 -vprofile high -preset slow -b:v 500k -maxrate 500k -bufsize 1000k -vf scale=-1:480 -threads
+  0 -acodec libvo_aacenc -b:a 128k output_file.mp4
+
+360p video for older mobile phones (360p at 250kbit/s in baseline profile):
+
+ffmpeg -i inputfile.avi -vcodec libx264 -vprofile baseline -preset slow -b:v 250k -maxrate 250k -bufsize 500k -vf scale=-1:360 -threads 0
+  -acodec libvo_aacenc -ab 96k output.mp4
+
+480p video for iPads and tablets (480p at 400kbit/s in main profile):
+
+ffmpeg -i inputfile.avi -vcodec libx264 -vprofile main -preset slow -b:v 400k -maxrate 400k -bufsize 800k -vf scale=-1:480 -threads 0 -acodec libvo_aacenc -ab 128k output.mp4
+
+////////////
+EXECUTE sp_configure 'show advanced options', 1
+RECONFIGURE WITH OVERRIDE
+GO
+
+EXECUTE sp_configure 'Agent XPs', 1
+RECONFIGURE WITH OVERRIDE
+GO
+
+EXECUTE sp_configure 'show advanced options', 0
+RECONFIGURE WITH OVERRIDE
+GO
+///////////
+%windir%\Microsoft.NET\Framework64\v4.0.30319
+Aspnet_regsql.exe -ssadd -E
+
+в веб-конфиг
+<system.web>
+ <pages>
+    <sessionState mode="SQLServer"
+       sqlConnectionString="Data Source=localhost,1433;User ID=sa;Password=123" />
+    <httpHandlers />
+    <pages controlRenderingCompatibilityVersion="4.0" enableEventValidation="false">
+    </pages>
+  </system.web>
+////////////////
+Информация о шаблоне <SUFLER> на 16.02.17 00:48:45
+
+Шаблон: SUFLER
+
+Описание: 		 
+
+СЕКЦИЯ ВЫПУСКА
+---------------------------------------
+<script src="/Scripts/jquery-2.0.1.min.js"></script>
+<input type="button" value="Save to RTF file" onclick="$('#downloadIframe').attr('src', GenerateRtfURL() )"/>
+<input type="button" value="Save to PLASET" onclick="toPlanset()">
+</input>
+<div id="promptDiv" style="font-size:26px">
+</div>
+<iframe style="display:none" id="downloadIframe">
+</iframe>
+<div id="content">
+@BLOCK
+</div>
+<script>
+
+
+var d='$NewsDate';
+d="/rtf/$NewsId/"+d.replace(":", "-").replace(":", "-").replace(" ", "_").replace(":", "-").replace(":", "-");
+
+$('#promptDiv').load(d+".txt", function(response, status, xhr){
+
+var tm=$('#promptDiv').html();
+$('#promptDiv').html(tm.replace(new RegExp(/\*\*\*+/, 'g'),  '<br>***<br>'));
+});
+
+function GenerateRtfURL() {
+return d+".rtf"
+}
+function toPlanset(){
+var txt="<html><head>";
+txt+='<meta name="viewport" content="width=device-width, initial-scale=1.0"></head>';
+txt+='<meta http-equiv="content-type" content="text/html; charset=UTF-8" />';
+txt+="<body><div style='font-size:40px'>";
+txt+=promptDiv.innerHTML;
+txt+="</div></body></html>";
+ var link = document.createElement('a');
+   
+link.setAttribute('download', 'planset.html');
+link.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(txt));
+    link.click(); 
+
+}
+
+</script>
+
+СЕКЦИЯ БЛОКА
+---------------------------------------
+ 
+
+СЕКЦИЯ ФЛАГОВ БЛОКА
+---------------------------------------
+	 	 
+
+СЕКЦИЯ ИСТОЧНИКОВ БЛОКА
+---------------------------------------
+<hr><b><font size=1> $BlockDependName</b><br>$BlockDependFile<br>
+</font> 
+
+-----------
+Информация о шаблоне <ПРОСТОЙ> на 16.02.17 00:50:16
+
+Шаблон: ПРОСТОЙ
+
+Описание: 		 
+
+СЕКЦИЯ ВЫПУСКАa
+---------------------------------------
+<link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+@media print{
+#tMainForm{
+font-size:28px !important;
+width:100%  !important;;
+}
+.pBlockBody{
+width:100%  !important;;
+}
+}
+</style>
+<div class='panel panel-default'; style='    width: 90vw' id='tMainForm'>
+<div class='panel-heading'>
+<h4><b>$NewsDate</b>&nbsp; $NewsName</h4>
+$NewsOwner, crono: $NewsDuration, calc: $NewsCronoCalk
+</div>
+@BLOCK
+</div>
+  
+
+СЕКЦИЯ БЛОКА
+---------------------------------------
+<link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+<div class='panel-body'>
+<div class='pBlockBody' style='border:1px solid #ddd;    width: calc(90vw - 30px);'>
+<div style='background-color:#ccc;padding:10px'>
+<b>$BlockType:</b>&nbsp;$BlockName
+<DIV><small>Автор:<b>&nbsp;$BlockAutor&nbsp;</b>Оператор:&nbsp;$BlockOperator&nbsp;Ведущий:$BlockJockey
+</small>
+</DIV>
+<DIV>
+</DIV>
+Фактический:&nbsp;$BlockCronoReal&nbsp;
+Заданный:&nbsp;$BlockCronoTask&nbsp;
+Планируемый:&nbsp;$BlockCronoCalc&nbsp;
+</div>
+</div>
+</div>
+
+
+ 
+
+СЕКЦИЯ ФЛАГОВ БЛОКА
+---------------------------------------
+	 	 
+
+СЕКЦИЯ ИСТОЧНИКОВ БЛОКА
+---------------------------------------
+<b>Носитель: $BlockDependName</b> <br>
+<font size=0.5>
+Имя файла  $BlockDependFile<br>
+Кассета   $BlockDependSourceLabel   -- $BlockDependTimeCode<br></font>
+
+ 
+ 
+
+-----------------
+Информация о шаблоне <Выводит все> на 16.02.17 00:50:27
+
+Шаблон: Выводит все
+
+Описание: 	5	 
+
+СЕКЦИЯ ВЫПУСКА
+---------------------------------------
+<link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+@media print{
+#tMainForm{
+font-size:20px !important;
+width:100%  !important;;
+}
+.pBlockBody{
+width:100%  !important;;
+}
+}
+</style>
+<div id='tMainForm' class='panel panel-default'; style='    width: 90vw'>
+<div class='panel-heading'>
+<h4><b>$NewsDate</b>&nbsp; $NewsName</h4>
+$NewsOwner, crono: $NewsDuration, calc: $NewsCronoCalk
+</div>
+@BLOCK
+</div>
+ 
+
+СЕКЦИЯ БЛОКА
+---------------------------------------
+<link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+@media print{
+#tMainForm{
+font-size:20px !important;
+width:100%  !important;;
+}
+.pBlockBody{
+width:100%  !important;;
+font-size:20px !important;
+}
+}
+</style>
+<div class='panel-body' style='padding:0 10px'>
+<div class='pBlockBody' style='border:1px solid #ddd;    width: calc(90vw - 30px);'>
+<div style='background-color:#ccc;padding: 0 10px'>
+<b>
+<span style='color:white; background:gray;padding:5px; margin:5px; border-radius:4px'>
+<script>
+var timeBlock=parseInt('$BlockNumber');
+document.write(( timeBlock/10)-1);
+</script
+
+</span>
+</b>
+<u style="font-size: x-large;"><b>
+$BlockType:</b>&nbsp;$BlockName</u>
+<DIV><small>Автор:<b>&nbsp;$BlockAutor&nbsp;</b>Оператор:&nbsp;$BlockOperator&nbsp;Ведущий:$BlockJockey
+</small>
+</div>
+</div>
+</DIV>
+<DIV>
+
+
+<div id='bText$BlockId' style='padding:10px;    word-break: break-word; font-size:20px !important'>
+$BlockText
+
+</div>
+
+</div>
+</div>
+
+
+ 
+
+СЕКЦИЯ ФЛАГОВ БЛОКА
+---------------------------------------
+	$Flag	 
+
+СЕКЦИЯ ИСТОЧНИКОВ БЛОКА
+---------------------------------------
+Название: $BlockDependName
+   Имя файла  $BlockDependFile
+Готов  $BlockDependReady
+Принят $BlockDependApprove
+ID  $BlockDependId
+Порядковый номер в блоке  $BlockDependNumber
+Кассета   $BlockDependSourceLabel   -- $BlockDependTimeCode
+ 
+
+

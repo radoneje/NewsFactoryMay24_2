@@ -1,0 +1,14 @@
+﻿@model IEnumerable<NFCrowlString.tSTR_playlist>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>бегущие строки</h2>
+<div id="stringWr">
+    @foreach (var item in Model)
+    {
+        Html.RenderAction("playList", "home", new { id = item.id });
+        break;
+    }
+</div>

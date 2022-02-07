@@ -1,0 +1,41 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Lite.master.cs" Inherits="WebApplication2.Lite" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Lite NewsFactory May24</title>
+    <script src="/Scripts/jquery-1.11.1.js"></script>
+    <script src="/Scripts/jquery-ui-1.10.3.min.js"></script>
+    <script src="/bootstrap/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/Styles/LiteStyle.css" rel="stylesheet" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+        <div class="panel  panel-default panel-warning">
+            <div class="panel-body">
+            Фабрика Новостей May24.
+            Упрощенный интерфейс. <a href="/Index.aspx"><small>к полному интерфейсу</small></a>
+            </div>
+        </div>
+    <div>
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+         
+    </div>
+    <div style="margin: 0 auto;  max-width: 330px; display:block;">
+        <h6>News Factory May24 News Room System<br />
+        Copyright <a href="http://www.newsfactory.ru">NewsFactory Ltd</a> 1999 - <%=DateTime.Now.ToString("yyyy") %></asp:Literal> </h6>
+        </div> 
+
+    </form>
+</body>
+</html>

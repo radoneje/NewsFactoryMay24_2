@@ -1,0 +1,35 @@
+﻿body {
+}
+.BEMediaImageContainer {
+    position:relative;
+}
+.BElrvStateContainer{
+    position: absolute;
+    top: 60%;
+    padding: 1px 3px;
+    width: calc( 100% - 10px);
+    height: 38%;
+    background: rgba(0, 0, 0, 0.5);
+    color:white;
+}
+
+.BElrvProgressPosition{
+     position: absolute;
+    top: 70%;
+    padding: 1px 3px;
+    height: 22%;
+}
+.BElrvProgressContainer{
+       width: calc( 40% - 10px);
+        background: #5cb85c !important;
+}
+.BElrvErrorContainer{
+    display:none; 
+    background: #d9534f !important;
+     width: calc( 100% - 10px);
+}
+.BElrvSuccessContainer{
+    display:none;  
+    background: #5cb85c !important;
+     width: calc( 100% - 10px);
+}

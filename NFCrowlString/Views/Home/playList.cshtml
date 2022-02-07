@@ -1,0 +1,26 @@
+﻿@model NFCrowlString.Models.CstrItems
+
+<p>
+    <div class="strBox">
+       
+        <div class="headerBox">
+            <div class="strDropDownPlaylists">
+                @Html.DropDownList("playlistId", Model.playList, new { @class = "playlistDropDown", @id = "playlistDropDown" })
+            </div>
+            <div class="findWr">
+                <input type="text" maxlength="255" placeholder="поиск"  />
+                <div class="findButton timerItemSectDeleteBtn" onclick="$('.findWr').find('input').val('')"></div>
+            </div>
+        </div>
+            
+        
+
+        <div class="strActiveWr" id="strActiveWr">
+            @Html.Partial("playListActive", Model._activeItems)
+        </div>
+        <div class="strPassiveWr" id="strPassiveWr">
+            @Html.Partial("playListPassive", Model._passiveItems)
+   
+        </div>
+    </div>
+</p>

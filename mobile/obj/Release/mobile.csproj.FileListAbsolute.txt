@@ -1,0 +1,14 @@
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.dll.config
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.dll
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.pdb
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.csprojResolveAssemblyReference.cache
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.dll
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.pdb
+\\psf\home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\System.Web.Helpers.dll
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.dll.config
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.dll
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\mobile.pdb
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\bin\System.Web.Helpers.dll
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.dll
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.pdb
+\\Mac\Home\Documents\Visual Studio 2013\Projects\NewsFactoryMay24\mobile\obj\Release\mobile.csprojResolveAssemblyReference.cache

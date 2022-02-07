@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>News Factory May 24</title>
+
+    <script src="/Scripts/jquery-2.0.1.min.js"></script>
+    
+    <link href="/bootstrap/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="/bootstrap/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <link href="/Styles/NFW.css" rel="stylesheet" />
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <script src="/Scripts/Utils.js"></script>
+    <script src="/Resources/lang0.js"></script>
+    <script src="/Scripts/jquery-ui-1.11.3.custom/jquery-ui-1.11.3.custom/jquery-ui.min.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+    <div class="panel panel-default" style="clear: both; margin: 5px; padding: 0 10px;">
+        <div style="float: left">
+            <img src="/Images/NewsFactoryLogoW300_notext.png" style="height: 3em; width: auto;">
+        </div>
+        <div style="float: right">
+            <script>
+                var langId = localStorage.getItem("languageId");
+                if (langId == null) {
+                    langId = 0;
+                    localStorage.setItem("languageId", langId);
+                }
+
+            </script>
+            <select id="LangSelect" onchange="ChangeLang($(this).find('option:selected').val());" style="">
+                <option value="0">rus</option>
+                <option value="1">eng</option>
+                <option value="2">az</option>
+            </select>
+            <button type="button" id="exitBtn" class="headBtn btn btn-default btn-xs" aria-label="Left Align" style="display:none;" onclick="exitUser();">
+                <span class="glyphicon glyphicon-log-out" aria-hidden="true">&nbsp;exit</span>
+            </button>
+            <button type="button" class="headBtn btn btn-default btn-xs" aria-label="Left Align" style="" onclick="document.location.href='/Content/manual_rus.pdf'">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true">&nbsp;help</span>
+            </button>
+
+            <div style="clear: both"></div>
+            <script>
+                ChangeLang(langId);
+            </script>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+
+    <div style="width:600px; margin: 10% auto">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="alert alert-danger">
+                    <h4>Ваш браузер не поддерживается.</h4>
+                    Пожалуйста, используйте<strong> Google Chrome</strong> или <strong>Firefox</strong>
+                </div>
+            </div>
+            
+            </div>
+    </div>
+</body>
+</html>
